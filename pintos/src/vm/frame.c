@@ -1,3 +1,4 @@
+#include <stdint.h>
 #include "vm/frame.h"
 
 /*
