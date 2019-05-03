@@ -32,6 +32,7 @@ create_frame_table_entry(void* frame){
 
 /* 
  * Make a new frame table entry for addr.
+ * frame should be allocated after page allocation.
  */
 bool
 allocate_frame (void *addr, enum palloc_flags flag)
