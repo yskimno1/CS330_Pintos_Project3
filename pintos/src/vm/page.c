@@ -16,5 +16,6 @@ struct sup_page_table_entry *
 allocate_page (void *addr)
 {
 
+    return NULL;
 }
 
