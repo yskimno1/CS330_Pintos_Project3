@@ -18,6 +18,6 @@ bool
 allocate_frame (void *addr)
 {
 
-
+    return false;
 }
 
