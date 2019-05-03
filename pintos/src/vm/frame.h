@@ -1,4 +1,5 @@
 #include <stdint.h>
+#include <stdbool.h>
 
 #ifndef VM_FRAME_H
 #define VM_FRAME_H
