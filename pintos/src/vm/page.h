@@ -1,4 +1,5 @@
 #include <stdint.h>
+#include <stdbool.h>
 
 #ifndef VM_PAGE_H
 #define VM_PAGE_H
