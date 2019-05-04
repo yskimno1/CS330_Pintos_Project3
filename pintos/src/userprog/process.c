@@ -163,7 +163,7 @@ process_exit (void)
   sema_up(&curr->sema_wait);
 
   /* wait until parent removes the child in the list */
-  while(curr->th_parent != NULL) sema_down(&curr->sema_exited);
+  sema_down(&curr->sema_exited);
 
   page_done();
 
@@ -184,7 +184,6 @@ process_exit (void)
       pagedir_destroy (pd);
       /* print message, kys0 */
     }
-  printf("test3\n");
 }
 
 /* Sets up the CPU for running user code in the current
