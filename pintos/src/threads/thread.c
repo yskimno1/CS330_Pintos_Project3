@@ -289,6 +289,7 @@ thread_exit ()
   ASSERT (!intr_context ());
 
 #ifdef USERPROG
+  printf("came here\n");
   process_exit ();
 #endif
 
