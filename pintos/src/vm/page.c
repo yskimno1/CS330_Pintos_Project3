@@ -7,7 +7,7 @@
 #include "vm/frame.h"
 #include "userprog/pagedir.h"
 #include "threads/vaddr.h"
-
+#include "userprog/process.h"
 
 /*
  * Initialize supplementary page table
@@ -53,26 +53,9 @@ free_page(struct list_elem* e){
     free(spt_e);
 }
 
-void* 
-grow_stack(void* addr){
-
-    struct sup_page_table_entry* spt_e = allocate_page(addr, false);
-    if(spt_e == NULL) return NULL;
-    
-    uint8_t* frame_addr = allocate_frame(spt_e, PAL_USER|PAL_ZERO);
-    spt_e->accessed = true;
-
-    if(frame_addr == NULL){
-        free(spt_e);
-        return NULL;
-    }
-    page_insert(spt_e);
-
-    return frame_addr;
-}
 
 bool
-grow_stack_at_page_fault(void* addr){
+grow_stack(void* addr){
     void* page_addr = pg_round_down(addr);
     struct sup_page_table_entry* spt_e = allocate_page(page_addr, true);
     uint8_t frame_addr = allocate_frame(spt_e, PAL_USER);
@@ -80,6 +63,14 @@ grow_stack_at_page_fault(void* addr){
         free(spt_e);
         return false;
     }
+
+    bool success = install_page(page_addr, frame_addr, true);
+    if(success == false){
+        free_frame(frame_addr);
+        free(spt_e);
+        return false;
+    }
     page_insert(spt_e);
+
     return true;
 }

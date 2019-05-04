@@ -519,57 +519,50 @@ setup_stack (void **esp, int argc, void** argv)
   uint8_t *kpage;
   bool success = false;
 
-  kpage = grow_stack(((uint8_t *) PHYS_BASE) - PGSIZE);
+  success = grow_stack(((uint8_t *) PHYS_BASE) - PGSIZE);
   
-  // kpage = palloc_get_page (PAL_USER | PAL_ZERO);
-  if (kpage != NULL) 
-    {
-      success = install_page (((uint8_t *) PHYS_BASE) - PGSIZE, kpage, true);
-      if(success){
-        *esp = PHYS_BASE;
-        /* Implementation start */
-        /* copy the pointer of argv */
-        
-        char* pargv[argc];
-        int i;
-        for(i=argc-1; i>=0; i--){
-          size_t argv_len = strlen(argv[i]);
-          *esp = *esp - (argv_len+1);
-          memcpy(*esp, argv[i], argv_len+1);
-          pargv[i] = *esp;
-        }
-        
-        /* word-align value */
-        while((int) *esp%4 != 0){
-          *esp = *esp - sizeof(uint8_t);
-          uint8_t temp = 0;
-          memcpy(*esp, &temp , sizeof(uint8_t));
-        }
-
-        /* argv */
-        char* zero = 0;
-        *esp = *esp - sizeof(char* );
-        memcpy(*esp, &zero, sizeof(char* ));
-        for(i=argc-1; i>=0; i--){ /* one more push */
-          *esp = *esp - (sizeof(char* ));
-          memcpy(*esp, &pargv[i], sizeof(char* ));
-        }
-        
-        char** p_argv = *esp;
-        *esp = *esp - sizeof(char** );
-        memcpy(*esp, &p_argv, sizeof(char **));
-
-        *esp = *esp - sizeof(int);
-        memcpy(*esp, &argc, sizeof(int));
-
-        void* return_addr = 0;
-        *esp = *esp - sizeof(void* );
-        memcpy(*esp, &return_addr, sizeof(void*));
-
-        // hex_dump(*esp-4, *esp-4, 100, 1);
+    if(success){
+      *esp = PHYS_BASE;
+      /* Implementation start */
+      /* copy the pointer of argv */
+      
+      char* pargv[argc];
+      int i;
+      for(i=argc-1; i>=0; i--){
+        size_t argv_len = strlen(argv[i]);
+        *esp = *esp - (argv_len+1);
+        memcpy(*esp, argv[i], argv_len+1);
+        pargv[i] = *esp;
       }
-      else
-        palloc_free_page (kpage);
+      
+      /* word-align value */
+      while((int) *esp%4 != 0){
+        *esp = *esp - sizeof(uint8_t);
+        uint8_t temp = 0;
+        memcpy(*esp, &temp , sizeof(uint8_t));
+      }
+
+      /* argv */
+      char* zero = 0;
+      *esp = *esp - sizeof(char* );
+      memcpy(*esp, &zero, sizeof(char* ));
+      for(i=argc-1; i>=0; i--){ /* one more push */
+        *esp = *esp - (sizeof(char* ));
+        memcpy(*esp, &pargv[i], sizeof(char* ));
+      }
+      
+      char** p_argv = *esp;
+      *esp = *esp - sizeof(char** );
+      memcpy(*esp, &p_argv, sizeof(char **));
+
+      *esp = *esp - sizeof(int);
+      memcpy(*esp, &argc, sizeof(int));
+
+      void* return_addr = 0;
+      *esp = *esp - sizeof(void* );
+      memcpy(*esp, &return_addr, sizeof(void*));
+
+      // hex_dump(*esp-4, *esp-4, 100, 1);
     }
   return success;
 }

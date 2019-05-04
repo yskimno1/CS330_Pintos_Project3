@@ -152,16 +152,18 @@ page_fault (struct intr_frame *f)
 
   bool success;
   if(is_user_vaddr(fault_addr) && not_present){
-     success = grow_stack_at_page_fault(fault_addr);
+     success = grow_stack(fault_addr);
+
+     if(success == false){
+      printf ("Page fault at %p: %s error %s page in %s context.\n",
+               fault_addr,
+               not_present ? "not present" : "rights violation",
+               write ? "writing" : "reading",
+               user ? "user" : "kernel");
+      kill (f);
+     }
   }
-  if(success == false){
-   printf ("Page fault at %p: %s error %s page in %s context.\n",
-            fault_addr,
-            not_present ? "not present" : "rights violation",
-            write ? "writing" : "reading",
-            user ? "user" : "kernel");
-   kill (f);
-  }
+  else exit(-1);
 //   exit(-1);
 //   printf ("Page fault at %p: %s error %s page in %s context.\n",
 //           fault_addr,
