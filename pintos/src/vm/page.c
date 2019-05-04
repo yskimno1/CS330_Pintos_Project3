@@ -12,6 +12,7 @@
  */
 void hash_action_before_destroy (struct hash_elem *e, void *aux){
     /* temporary made */
+    printf("hash action! \n");
 }
 
 unsigned
@@ -33,6 +34,7 @@ page_init (void)
 {
     struct thread* curr = thread_current();
     hash_init(curr->sup_page_table, hash_func, hash_less, 0);
+    return;
 }
 
 /*

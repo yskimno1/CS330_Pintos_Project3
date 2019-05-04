@@ -163,9 +163,9 @@ process_exit (void)
   sema_up(&curr->sema_wait);
   /* wait until parent removes the child in the list */
   sema_down(&curr->sema_exited);
-
-
+  printf("test1\n");
   page_done();
+  printf("test2\n");
   /* Destroy the current process's page directory and switch back
     to the kernel-only page directory. */
   pd = curr->pagedir;
@@ -183,7 +183,7 @@ process_exit (void)
       pagedir_destroy (pd);
       /* print message, kys0 */
     }
-
+  printf("test3\n");
 }
 
 /* Sets up the CPU for running user code in the current
