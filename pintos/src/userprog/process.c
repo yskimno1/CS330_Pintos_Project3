@@ -20,6 +20,7 @@
 #include "threads/synch.h"
 
 #include "vm/page.h"
+#include "vm/frame.h"
 
 #define ARGV_MAX_SIZE 128
 
@@ -520,6 +521,14 @@ setup_stack (void **esp, int argc, void** argv)
   bool success = false;
 
   // success = setup_stack_grow(((uint8_t *) PHYS_BASE) - PGSIZE);
+  
+  struct sup_page_table_entry* spt_e = allocate_page(((uint8_t* )PHYS_BASE) - PGSIZE, false);
+  if(spt_e==NULL){
+      printf("spte null\n");
+      return false;
+  }
+  uint8_t frame_addr = allocate_frame(spt_e, PAL_USER|PAL_ZERO);
+
   
   kpage = palloc_get_page(PAL_USER | PAL_ZERO);
   if(kpage != NULL){
