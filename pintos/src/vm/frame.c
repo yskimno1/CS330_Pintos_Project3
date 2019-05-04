@@ -54,9 +54,9 @@ allocate_frame (struct sup_page_table_entry* spt_e, enum palloc_flags flag)
     if(fte == NULL) return NULL;
     printf("======= first %d %d =======\n", frame==NULL, fte==NULL);
 
-    lock_acquire(&lock_frame);
+    // lock_acquire(&lock_frame);
     insert_frame_table(fte);
-    lock_release(&lock_frame);
+    // lock_release(&lock_frame);
     printf("======= second %d %d =======\n", frame==NULL, fte==NULL);
     
     return frame;
