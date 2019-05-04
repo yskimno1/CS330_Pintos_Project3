@@ -11,9 +11,11 @@
 void 
 frame_init (void)
 {
+    printf("frame init start\n");
     list_init(&frame_table);
     /* Needs frame lock */
     lock_init(&lock_frame);
+    printf("frame init done\n");
 }
 
 void

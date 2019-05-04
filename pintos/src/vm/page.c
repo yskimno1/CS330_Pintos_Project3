@@ -32,8 +32,10 @@ hash_less(const struct hash_elem* a, const struct hash_elem* b, void* aux){
 void 
 page_init (void)
 {
+    printf("page init start\n");
     struct thread* curr = thread_current();
     hash_init(curr->sup_page_table, hash_func, hash_less, 0);
+    printf("page init done\n");
     return;
 }
 
@@ -66,6 +68,8 @@ grow_stack(void* addr){
 void
 page_done(void)
 {
+    printf("page done start\n");
     struct thread* curr = thread_current();
     hash_destroy(curr->sup_page_table, hash_action_before_destroy);
+    printf("page done done\n");
 }
