@@ -150,7 +150,7 @@ page_fault (struct intr_frame *f)
   write = (f->error_code & PF_W) != 0;
   user = (f->error_code & PF_U) != 0;
 
-  void* success;
+  bool success;
   if(is_user_vaddr(fault_addr) && not_present){
      success = grow_stack_at_page_fault(fault_addr);
   }
