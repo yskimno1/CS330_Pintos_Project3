@@ -23,7 +23,8 @@ list_less(const struct list_elem* a, const struct list_elem* b, void* aux){
 void
 page_insert(struct sup_page_table_entry* spt_e){
     struct thread* curr = thread_current();
-    list_insert_ordered(&curr->sup_page_table, &(spt_e->elem), list_less, 0);
+    // list_push_back(&curr->sup_page_table, spt_e->elem);
+    list_insert_ordered(&curr->sup_page_table, &spt_e->elem, list_less, 0);
 }
 
 /*
