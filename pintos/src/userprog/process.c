@@ -519,7 +519,7 @@ setup_stack (void **esp, int argc, void** argv)
   uint8_t *kpage;
   bool success = false;
 
-  success = grow_stack(((uint8_t *) PHYS_BASE) - PGSIZE);
+  success = setup_stack_grow(((uint8_t *) PHYS_BASE) - PGSIZE);
   
     if(success){
       *esp = PHYS_BASE;

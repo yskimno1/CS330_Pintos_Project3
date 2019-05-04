@@ -58,7 +58,6 @@ bool
 grow_stack(void* addr){
     void* page_addr = pg_round_down(addr);
     struct sup_page_table_entry* spt_e = allocate_page(page_addr, true);
-    printf("spte : %d\n", spt_e == NULL);
 
     uint8_t frame_addr = allocate_frame(spt_e, PAL_USER);
     if(frame_addr==NULL){
@@ -75,6 +74,35 @@ grow_stack(void* addr){
         return false;
     }
     page_insert(spt_e);
+
+    return true;
+}
+
+bool
+setup_stack_grow(void* addr){
+    struct sup_page_table_entry* spt_e = allocate_page(addr, false);
+    if(spt_e==NULL){
+        printf("spte null\n");
+        return false;
+    }
+
+    uint8_t frame_addr = allocate_frame(spt_e, PAL_USER|PAL_ZERO);
+    if(frame_addr==NULL){
+        printf("frame null\n");
+        free(spt_e);
+        return false;
+    }
+    spt_e->accessed = true;
+    page_insert(spt_e); // can insert at front kys
+
+    bool success = install_page(addr, frame_addr, true);
+    if(success == false){
+        printf("install page failed\n");
+        free_frame(frame_addr);
+        free(spt_e);
+        return false;
+    }
+
 
     return true;
 }
