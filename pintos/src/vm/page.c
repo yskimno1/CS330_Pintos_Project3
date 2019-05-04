@@ -59,7 +59,7 @@ grow_stack(void* addr){
     void* page_addr = pg_round_down(addr);
     struct sup_page_table_entry* spt_e = allocate_page(page_addr, true);
 
-    uint8_t frame_addr = allocate_frame(spt_e, PAL_USER);
+    uint8_t* frame_addr = allocate_frame(spt_e, PAL_USER);
     if(frame_addr==NULL){
         printf("frame null\n");
         free(spt_e);
@@ -86,7 +86,7 @@ setup_stack_grow(void* addr){
         return false;
     }
 
-    uint8_t frame_addr = allocate_frame(spt_e, PAL_USER|PAL_ZERO);
+    uint8_t* frame_addr = allocate_frame(spt_e, PAL_USER|PAL_ZERO);
     if(frame_addr==NULL){
         printf("frame null\n");
         free(spt_e);

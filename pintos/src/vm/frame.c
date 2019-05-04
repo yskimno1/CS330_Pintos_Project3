@@ -46,7 +46,7 @@ uint8_t*
 allocate_frame (struct sup_page_table_entry* spt_e, enum palloc_flags flag)
 {
     ASSERT(flag & PAL_USER);
-    printf("flag : %d\n", flag);
+
     uint8_t* frame = palloc_get_page(flag);
     ASSERT(frame!=NULL);
     // if(frame == NULL) PANIC("frame is full");
@@ -54,11 +54,11 @@ allocate_frame (struct sup_page_table_entry* spt_e, enum palloc_flags flag)
     ASSERT(fte != NULL);
     if(fte == NULL) return NULL;
 
-    // lock_acquire(&lock_frame);
+    lock_acquire(&lock_frame);
     insert_frame_table(fte);
-    // lock_release(&lock_frame);
+    lock_release(&lock_frame);
     ASSERT(frame!=NULL);
-    printf("frame : %p\n", frame);
+
     return frame;
 }
 

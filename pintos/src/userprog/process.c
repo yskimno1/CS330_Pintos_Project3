@@ -521,67 +521,53 @@ setup_stack (void **esp, int argc, void** argv)
   bool success = false;
 
   // success = setup_stack_grow(((uint8_t *) PHYS_BASE) - PGSIZE);
-  
-  struct sup_page_table_entry* spt_e = allocate_page(((uint8_t* )PHYS_BASE) - PGSIZE, false);
-  if(spt_e==NULL){
-      printf("spte null\n");
-      return false;
+
+  success = setup_stack_grow(((uint8_t* )PHYS_BASE) - PGSIZE);
+  if(success){
+    *esp = PHYS_BASE;
+    /* Implementation start */
+    /* copy the pointer of argv */
+    
+    char* pargv[argc];
+    int i;
+    for(i=argc-1; i>=0; i--){
+      size_t argv_len = strlen(argv[i]);
+      *esp = *esp - (argv_len+1);
+      memcpy(*esp, argv[i], argv_len+1);
+      pargv[i] = *esp;
+    }
+    
+    /* word-align value */
+    while((int) *esp%4 != 0){
+      *esp = *esp - sizeof(uint8_t);
+      uint8_t temp = 0;
+      memcpy(*esp, &temp , sizeof(uint8_t));
+    }
+
+    /* argv */
+    char* zero = 0;
+    *esp = *esp - sizeof(char* );
+    memcpy(*esp, &zero, sizeof(char* ));
+    for(i=argc-1; i>=0; i--){ /* one more push */
+      *esp = *esp - (sizeof(char* ));
+      memcpy(*esp, &pargv[i], sizeof(char* ));
+    }
+    
+    char** p_argv = *esp;
+    *esp = *esp - sizeof(char** );
+    memcpy(*esp, &p_argv, sizeof(char **));
+
+    *esp = *esp - sizeof(int);
+    memcpy(*esp, &argc, sizeof(int));
+
+    void* return_addr = 0;
+    *esp = *esp - sizeof(void* );
+    memcpy(*esp, &return_addr, sizeof(void*));
+
+    // hex_dump(*esp-4, *esp-4, 100, 1);
   }
-  uint8_t* frame_addr = allocate_frame(spt_e, PAL_USER|PAL_ZERO);
-  ASSERT(frame_addr!=NULL);
-  printf("frame_addr : %p\n", frame_addr);
-  if(frame_addr == NULL) printf("allocate failed\n");
-
-  kpage = palloc_get_page(PAL_USER | PAL_ZERO);
-  if(kpage != NULL){
-    success = install_page(((uint8_t* )PHYS_BASE) - PGSIZE, kpage, true);
-    if(success){
-      *esp = PHYS_BASE;
-      /* Implementation start */
-      /* copy the pointer of argv */
-      
-      char* pargv[argc];
-      int i;
-      for(i=argc-1; i>=0; i--){
-        size_t argv_len = strlen(argv[i]);
-        *esp = *esp - (argv_len+1);
-        memcpy(*esp, argv[i], argv_len+1);
-        pargv[i] = *esp;
-      }
-      
-      /* word-align value */
-      while((int) *esp%4 != 0){
-        *esp = *esp - sizeof(uint8_t);
-        uint8_t temp = 0;
-        memcpy(*esp, &temp , sizeof(uint8_t));
-      }
-
-      /* argv */
-      char* zero = 0;
-      *esp = *esp - sizeof(char* );
-      memcpy(*esp, &zero, sizeof(char* ));
-      for(i=argc-1; i>=0; i--){ /* one more push */
-        *esp = *esp - (sizeof(char* ));
-        memcpy(*esp, &pargv[i], sizeof(char* ));
-      }
-      
-      char** p_argv = *esp;
-      *esp = *esp - sizeof(char** );
-      memcpy(*esp, &p_argv, sizeof(char **));
-
-      *esp = *esp - sizeof(int);
-      memcpy(*esp, &argc, sizeof(int));
-
-      void* return_addr = 0;
-      *esp = *esp - sizeof(void* );
-      memcpy(*esp, &return_addr, sizeof(void*));
-
-      // hex_dump(*esp-4, *esp-4, 100, 1);
-    }
-    else{
-      palloc_free_page(kpage);
-      printf("grow stack failed!\n");
-    }
+  else{
+    printf("grow stack failed\n");
   }
   return success;
   
