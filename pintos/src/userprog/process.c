@@ -528,8 +528,8 @@ setup_stack (void **esp, int argc, void** argv)
       return false;
   }
   uint8_t frame_addr = allocate_frame(spt_e, PAL_USER|PAL_ZERO);
+  if(frame_addr == NULL) printf("allocate failed\n");
 
-  
   kpage = palloc_get_page(PAL_USER | PAL_ZERO);
   if(kpage != NULL){
     success = install_page(((uint8_t* )PHYS_BASE) - PGSIZE, kpage, true);
