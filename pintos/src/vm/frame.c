@@ -20,7 +20,7 @@ frame_init (void)
 
 void
 insert_frame_table(struct frame_table_entry* fte){
-    list_push_back(&frame_table, fte->elem_table_list);
+    list_push_back(&frame_table, &fte->elem_table_list);
 }
 
 struct frame_table_entry*

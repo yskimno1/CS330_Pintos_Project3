@@ -50,5 +50,7 @@ grow_stack(void* addr){
         free(spt_e);
         return NULL;
     }
+    page_insert(spt_e);
+    
     return frame_addr;
 }
