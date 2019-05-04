@@ -27,7 +27,6 @@ struct frame_table_entry*
 create_frame_table_entry(void* frame, struct frame_table_entry* spt_e){
     struct frame_table_entry* fte = malloc(sizeof(struct frame_table_entry));
     if(fte==NULL){
-        printf("fte null\n");
         return NULL;
     }
 
@@ -53,9 +52,13 @@ allocate_frame (struct sup_page_table_entry* spt_e, enum palloc_flags flag)
     // if(frame == NULL) PANIC("frame is full");
     struct frame_table_entry* fte = create_frame_table_entry(frame, spt_e);
     if(fte == NULL) return NULL;
+    printf("======= first %d %d =======\n", frame==NULL, fte==NULL);
+
     lock_acquire(&lock_frame);
     insert_frame_table(fte);
     lock_release(&lock_frame);
+    printf("======= second %d %d =======\n", frame==NULL, fte==NULL);
+    
     return frame;
 }
 
