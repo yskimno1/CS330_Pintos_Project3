@@ -163,7 +163,10 @@ page_fault (struct intr_frame *f)
       kill (f);
      }
   }
-  else exit(-1);
+  else{
+     printf("wrong case!\n");
+     exit(-1);
+  }
 //   exit(-1);
 //   printf ("Page fault at %p: %s error %s page in %s context.\n",
 //           fault_addr,
