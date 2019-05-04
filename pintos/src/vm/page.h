@@ -27,4 +27,5 @@ void page_init (void);
 struct sup_page_table_entry*  allocate_page (void *addr, bool accces);
 void page_done(void);
 void* grow_stack(void* addr);
+bool grow_stack_at_page_fault(void* addr);
 #endif /* vm/page.h */

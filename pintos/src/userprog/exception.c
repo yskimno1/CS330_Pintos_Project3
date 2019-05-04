@@ -152,9 +152,9 @@ page_fault (struct intr_frame *f)
 
   void* success;
   if(is_user_vaddr(fault_addr) && not_present){
-     success = grow_stack(fault_addr);
+     success = grow_stack_at_page_fault(fault_addr);
   }
-  if(success == NULL){
+  if(success == false){
    printf ("Page fault at %p: %s error %s page in %s context.\n",
             fault_addr,
             not_present ? "not present" : "rights violation",

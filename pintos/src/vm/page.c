@@ -6,6 +6,7 @@
 #include "threads/thread.h"
 #include "vm/frame.h"
 #include "userprog/pagedir.h"
+#include "threads/vaddr.h"
 
 
 /*
@@ -54,6 +55,7 @@ free_page(struct list_elem* e){
 
 void* 
 grow_stack(void* addr){
+
     struct sup_page_table_entry* spt_e = allocate_page(addr, false);
     if(spt_e == NULL) return NULL;
     
@@ -67,4 +69,17 @@ grow_stack(void* addr){
     page_insert(spt_e);
 
     return frame_addr;
+}
+
+bool
+grow_stack_at_page_fault(void* addr){
+    void* page_addr = pg_round_down(addr);
+    struct sup_page_table_entry* spt_e = allocate_page(page_addr, true);
+    uint8_t frame_addr = allocate_frame(spt_e, PAL_USER);
+    if(frame_addr==NULL){
+        free(spt_e);
+        return false;
+    }
+    page_insert(spt_e);
+    return true;
 }
