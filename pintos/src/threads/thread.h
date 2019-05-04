@@ -110,7 +110,7 @@ struct thread
     /* Owned by thread.c. */
     unsigned magic;                     /* Detects stack overflow. */
 
-    struct list* sup_page_table;
+    struct list sup_page_table;
     //struct ~~ s_pt;
   };
 

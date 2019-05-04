@@ -65,7 +65,6 @@ process_execute (const char *file_name)
   char* func_name = strtok_r(filename_copy, " ", &saveptr);
 
   /* Create a new thread to execute FUNC_NAME. */
-  list_init(thread_current()->sup_page_table);
   tid = thread_create (func_name, PRI_DEFAULT, start_process, fn_copy);
   sema_down(&thread_current()->sema_load);
 
