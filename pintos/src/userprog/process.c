@@ -144,15 +144,11 @@ process_wait (tid_t child_tid)
   th_child = search_child(child_tid);
   if(th_child == NULL) return -1;
 
-  printf("waiting for...1\n");
   sema_down(&th_child->sema_wait);
   th_child = search_child(child_tid);
-  printf("waiting for...2\n");
   list_remove(&th_child->elem_list_children);
   status = th_child->exit_status;
-  printf("waiting for..3\n");
   sema_up(&th_child->sema_exited);
-  printf("waiting for..4\n");
   return status;
 }
 
@@ -164,14 +160,13 @@ process_exit (void)
   uint32_t *pd;
 
   curr->is_exited = true;
-  printf("test0\n");
   sema_up(&curr->sema_wait);
-  printf("test11\n");
+
   /* wait until parent removes the child in the list */
-  sema_down(&curr->sema_exited);
-  printf("test1\n");
+  while(curr->th_parent != NULL) sema_down(&curr->sema_exited);
+
   page_done();
-  printf("test2\n");
+
   /* Destroy the current process's page directory and switch back
     to the kernel-only page directory. */
   pd = curr->pagedir;
