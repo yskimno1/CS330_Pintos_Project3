@@ -1,6 +1,7 @@
 #include <stdint.h>
 #include <stdbool.h>
 #include "threads/palloc.h"
+#include <list.h>
 
 #ifndef VM_FRAME_H
 #define VM_FRAME_H
@@ -18,6 +19,6 @@ struct frame_table_entry
 };
 
 void frame_init (void);
-bool allocate_frame (void *addr, enum palloc_flags flag);
+void* allocate_frame(struct sup_page_table_entry* spt_e, enum palloc_flags flag);
 
 #endif /* vm/frame.h */

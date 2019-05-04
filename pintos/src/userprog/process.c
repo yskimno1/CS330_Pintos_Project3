@@ -19,6 +19,8 @@
 #include "threads/vaddr.h"
 #include "threads/synch.h"
 
+#include "vm/page.h"
+
 #define ARGV_MAX_SIZE 128
 
 static thread_func start_process NO_RETURN;
@@ -63,6 +65,7 @@ process_execute (const char *file_name)
   char* func_name = strtok_r(filename_copy, " ", &saveptr);
 
   /* Create a new thread to execute FUNC_NAME. */
+  page_init();
   tid = thread_create (func_name, PRI_DEFAULT, start_process, fn_copy);
   sema_down(&thread_current()->sema_load);
 
@@ -178,7 +181,7 @@ process_exit (void)
       pagedir_destroy (pd);
       /* print message, kys0 */
     }
-
+  page_done();
 }
 
 /* Sets up the CPU for running user code in the current
@@ -515,6 +518,8 @@ setup_stack (void **esp, int argc, void** argv)
 {
   uint8_t *kpage;
   bool success = false;
+
+  
 
   kpage = palloc_get_page (PAL_USER | PAL_ZERO);
   if (kpage != NULL) 
