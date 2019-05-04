@@ -527,7 +527,7 @@ setup_stack (void **esp, int argc, void** argv)
       printf("spte null\n");
       return false;
   }
-  uint8_t frame_addr = allocate_frame(spt_e, PAL_USER|PAL_ZERO);
+  uint8_t* frame_addr = allocate_frame(spt_e, PAL_USER|PAL_ZERO);
   ASSERT(frame_addr!=NULL);
   printf("frame_addr : %p\n", frame_addr);
   if(frame_addr == NULL) printf("allocate failed\n");
