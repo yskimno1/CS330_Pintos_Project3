@@ -150,23 +150,26 @@ page_fault (struct intr_frame *f)
   write = (f->error_code & PF_W) != 0;
   user = (f->error_code & PF_U) != 0;
 
-  bool success;
-  if(is_user_vaddr(fault_addr) && not_present){
-     success = grow_stack(fault_addr);
+  exit(-1);
+//   bool success;
+//   if(is_user_vaddr(fault_addr) && not_present){
+//      success = grow_stack(fault_addr);
 
-     if(success == false){
-      printf ("Page fault at %p: %s error %s page in %s context.\n",
-               fault_addr,
-               not_present ? "not present" : "rights violation",
-               write ? "writing" : "reading",
-               user ? "user" : "kernel");
-      kill (f);
-     }
-  }
-  else{
-     printf("wrong case!\n");
-     exit(-1);
-  }
+//      if(success == false){
+//       printf ("Page fault at %p: %s error %s page in %s context.\n",
+//                fault_addr,
+//                not_present ? "not present" : "rights violation",
+//                write ? "writing" : "reading",
+//                user ? "user" : "kernel");
+//       kill (f);
+//      }
+//   }
+//   else{
+//      printf("wrong case!\n");
+//      exit(-1);
+//   }
+
+
 //   exit(-1);
 //   printf ("Page fault at %p: %s error %s page in %s context.\n",
 //           fault_addr,
