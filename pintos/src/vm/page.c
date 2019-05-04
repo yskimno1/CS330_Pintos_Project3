@@ -58,14 +58,18 @@ bool
 grow_stack(void* addr){
     void* page_addr = pg_round_down(addr);
     struct sup_page_table_entry* spt_e = allocate_page(page_addr, true);
+    printf("spte : %d\n", spt_e == NULL);
+
     uint8_t frame_addr = allocate_frame(spt_e, PAL_USER);
     if(frame_addr==NULL){
+        printf("frame null\n");
         free(spt_e);
         return false;
     }
 
     bool success = install_page(page_addr, frame_addr, true);
     if(success == false){
+        printf("install page failed\n");
         free_frame(frame_addr);
         free(spt_e);
         return false;
