@@ -564,6 +564,9 @@ setup_stack (void **esp, int argc, void** argv)
 
       // hex_dump(*esp-4, *esp-4, 100, 1);
     }
+    else{
+      printf("grow stack failed!\n");
+    }
   return success;
 }
 
