@@ -204,16 +204,14 @@ exit (int status){
   t->exit_status = status;
 	printf("%s: exit(%d)\n", thread_name(), status);
 	int i; 
-	printf("exit 1\n");
   filelock_acquire();
-	printf("exit 2\n");
   for (i = 3; i < 131; i++) {
       if (t->fdt[i] != NULL){
         file_close(t->fdt[i]);
         t->fdt[i] = NULL;
       }  
   }   
-	printf("exit 3\n");
+
 	filelock_release();
   thread_exit ();
 } 
