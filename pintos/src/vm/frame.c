@@ -1,10 +1,10 @@
 #include <stdint.h>
 #include <stdbool.h>
-#include "vm/frame.h"
+
 #include "threads/thread.h"
 #include "threads/palloc.h"
 #include "vm/page.h"
-
+#include "vm/frame.h"
 /*
  * Initialize frame table
  */

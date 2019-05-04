@@ -22,7 +22,6 @@ struct sup_page_table_entry
 };
 
 
-
 unsigned hash_func(struct hash_elem* e, void* aux);
 bool hash_less(const struct hash_elem* a, const struct hash_elem* b, void* aux);
 void page_init (void);
