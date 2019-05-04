@@ -15,11 +15,11 @@ struct frame_table_entry
 	struct thread* owner;
 	struct sup_page_table_entry* spte;
 
-	struct list_elem* elem_table_list;
+	struct list_elem elem_table_list;
 };
 
 void frame_init (void);
 struct frame_table_entry* create_frame_table_entry(void* frame, struct frame_table_entry* spt_e);
 void* allocate_frame(struct sup_page_table_entry* spt_e, enum palloc_flags flag);
-
+void* free_frame (void* frame);
 #endif /* vm/frame.h */

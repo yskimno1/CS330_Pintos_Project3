@@ -45,6 +45,7 @@ allocate_frame (struct sup_page_table_entry* spt_e, enum palloc_flags flag)
 {
     ASSERT(flag & PAL_USER);
     void* frame = palloc_get_page(flag);
+    if(frame == NULL) PANIC("frame is full");
     struct frame_table_entry* fte = create_frame_table_entry(frame, spt_e);
     if(fte == NULL) return NULL;
     lock_acquire(&lock_frame);
@@ -53,7 +54,35 @@ allocate_frame (struct sup_page_table_entry* spt_e, enum palloc_flags flag)
     return frame;
 }
 
+static struct frame_table_entry*
+search_frame_table_entry (void* frame){
+  struct list_elem* e;
+  struct frame_table_entry* fte;
+  if(!list_empty(&frame_table)){
+    for(e=list_begin(&frame_table); e!=list_end(&frame_table); e = list_next(e)){
+      fte = list_entry(e, struct frame_table_entry, elem_table_list);
+      if(fte->frame == frame) return fte;
+    }
+  }
+  return NULL;
+}
+
 void*
-free_frame (struct sup_page_table_entry* spt_e){
-    
+free_frame (void* frame){
+    lock_acquire(&lock_frame);
+    struct list_elem* e;
+    struct frame_table_entry* fte;
+    if(!list_empty(&frame_table)){
+        for(e=list_begin(&frame_table); e!=list_end(&frame_table); e = list_next(e)){
+            fte = list_entry(e, struct frame_table_entry, elem_table_list);
+            if(fte->frame == frame){
+                list_remove(e);
+                free(fte);
+                palloc_free_page(frame);
+                break;
+            }
+        }
+    }
+
+    lock_release(&lock_frame);
 }
