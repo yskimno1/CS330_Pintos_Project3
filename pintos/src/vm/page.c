@@ -10,22 +10,13 @@
 /*
  * Initialize supplementary page table
  */
-void hash_action_before_destroy (struct hash_elem *e, void *aux){
-    /* temporary made */
-    printf("hash action! \n");
-}
 
-unsigned
-hash_func(struct hash_elem* e, void* aux){
-    struct sup_page_table_entry* spt_e = hash_entry(e, struct sup_page_table_entry, elem);
-    return hash_int(spt_e->user_vaddr);
-}
 
 /* true if A is less than B */
 bool
-hash_less(const struct hash_elem* a, const struct hash_elem* b, void* aux){
-    struct sup_page_table_entry* spt_e_1 = hash_entry(a, struct sup_page_table_entry, elem);
-    struct sup_page_table_entry* spt_e_2 = hash_entry(b, struct sup_page_table_entry, elem);
+list_less(const struct list_elem* a, const struct list_elem* b, void* aux){
+    struct sup_page_table_entry* spt_e_1 = list_entry(a, struct sup_page_table_entry, elem);
+    struct sup_page_table_entry* spt_e_2 = list_entry(b, struct sup_page_table_entry, elem);
     return (spt_e_1->user_vaddr < spt_e_1->user_vaddr); // not using hash_func b/c all user_vaddr are different
 }
 
@@ -34,7 +25,7 @@ page_init (void)
 {
     printf("page init start\n");
     struct thread* curr = thread_current();
-    hash_init(curr->sup_page_table, hash_func, hash_less, 0);
+    list_init(curr->sup_page_table);
     printf("page init done\n");
     return;
 }
@@ -70,6 +61,5 @@ page_done(void)
 {
     printf("page done start\n");
     struct thread* curr = thread_current();
-    hash_destroy(curr->sup_page_table, hash_action_before_destroy);
     printf("page done done\n");
 }
