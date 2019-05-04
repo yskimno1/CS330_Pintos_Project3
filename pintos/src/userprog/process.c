@@ -164,6 +164,8 @@ process_exit (void)
   /* wait until parent removes the child in the list */
   sema_down(&curr->sema_exited);
 
+
+  page_done();
   /* Destroy the current process's page directory and switch back
     to the kernel-only page directory. */
   pd = curr->pagedir;
@@ -181,7 +183,7 @@ process_exit (void)
       pagedir_destroy (pd);
       /* print message, kys0 */
     }
-  page_done();
+
 }
 
 /* Sets up the CPU for running user code in the current
@@ -520,7 +522,6 @@ setup_stack (void **esp, int argc, void** argv)
   bool success = false;
 
   
-
   kpage = palloc_get_page (PAL_USER | PAL_ZERO);
   if (kpage != NULL) 
     {
