@@ -519,8 +519,11 @@ setup_stack (void **esp, int argc, void** argv)
   uint8_t *kpage;
   bool success = false;
 
-  success = setup_stack_grow(((uint8_t *) PHYS_BASE) - PGSIZE);
+  // success = setup_stack_grow(((uint8_t *) PHYS_BASE) - PGSIZE);
   
+  kpage = palloc_get_page(PAL_USER | PAL_ZERO);
+  if(kpage != NULL){
+    success = install_page(((uint8_t* )PHYS_BASE) - PGSIZE, kpage, true);
     if(success){
       *esp = PHYS_BASE;
       /* Implementation start */
@@ -565,9 +568,12 @@ setup_stack (void **esp, int argc, void** argv)
       // hex_dump(*esp-4, *esp-4, 100, 1);
     }
     else{
+      palloc_free_page(kpage);
       printf("grow stack failed!\n");
     }
+  }
   return success;
+  
 }
 
 /* Adds a mapping from user virtual address UPAGE to kernel

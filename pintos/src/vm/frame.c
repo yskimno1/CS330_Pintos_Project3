@@ -40,11 +40,11 @@ create_frame_table_entry(void* frame, struct frame_table_entry* spt_e){
  * Make a new frame table entry for addr.
  * frame should be allocated after page allocation.
  */
-void*
+uint8_t*
 allocate_frame (struct sup_page_table_entry* spt_e, enum palloc_flags flag)
 {
     ASSERT(flag & PAL_USER);
-    void* frame = palloc_get_page(flag);
+    uint8_t* frame = palloc_get_page(flag);
     // if(frame == NULL) PANIC("frame is full");
     struct frame_table_entry* fte = create_frame_table_entry(frame, spt_e);
     if(fte == NULL) return NULL;
