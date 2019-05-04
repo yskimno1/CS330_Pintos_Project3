@@ -164,7 +164,9 @@ process_exit (void)
   uint32_t *pd;
 
   curr->is_exited = true;
+  printf("test0\n");
   sema_up(&curr->sema_wait);
+  printf("test11\n");
   /* wait until parent removes the child in the list */
   sema_down(&curr->sema_exited);
   printf("test1\n");
