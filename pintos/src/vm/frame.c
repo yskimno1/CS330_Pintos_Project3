@@ -26,7 +26,10 @@ insert_frame_table(struct frame_table_entry* fte){
 struct frame_table_entry*
 create_frame_table_entry(void* frame, struct frame_table_entry* spt_e){
     struct frame_table_entry* fte = malloc(sizeof(struct frame_table_entry));
-    if(fte==NULL) return NULL;
+    if(fte==NULL){
+        printf("fte null\n");
+        return NULL;
+    }
 
     fte->frame = frame;
     fte->owner = thread_current();
@@ -46,8 +49,6 @@ allocate_frame (struct sup_page_table_entry* spt_e, enum palloc_flags flag)
     ASSERT(flag & PAL_USER);
     printf("flag : %d\n", flag);
     uint8_t* frame = palloc_get_page(flag);
-    if(frame == NULL) printf("frame null \n");
-    else printf("frame not null\n");
     
     // if(frame == NULL) PANIC("frame is full");
     struct frame_table_entry* fte = create_frame_table_entry(frame, spt_e);
