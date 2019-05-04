@@ -19,6 +19,7 @@ struct frame_table_entry
 };
 
 void frame_init (void);
+struct frame_table_entry* create_frame_table_entry(void* frame, struct frame_table_entry* spt_e);
 void* allocate_frame(struct sup_page_table_entry* spt_e, enum palloc_flags flag);
 
 #endif /* vm/frame.h */

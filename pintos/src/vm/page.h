@@ -5,7 +5,7 @@
 #ifndef VM_PAGE_H
 #define VM_PAGE_H
 
-struct list sup_page_table;
+// struct list sup_page_table;
 
 struct sup_page_table_entry 
 {
@@ -26,5 +26,5 @@ bool list_less(const struct list_elem* a, const struct list_elem* b, void* aux);
 void page_init (void);
 struct sup_page_table_entry*  allocate_page (void *addr);
 void page_done(void);
-
+void* grow_stack(void* addr);
 #endif /* vm/page.h */
