@@ -52,3 +52,8 @@ allocate_frame (struct sup_page_table_entry* spt_e, enum palloc_flags flag)
     lock_release(&lock_frame);
     return frame;
 }
+
+void*
+free_frame (struct sup_page_table_entry* spt_e){
+    
+}

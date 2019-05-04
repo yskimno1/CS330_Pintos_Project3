@@ -519,9 +519,9 @@ setup_stack (void **esp, int argc, void** argv)
   uint8_t *kpage;
   bool success = false;
 
-  kpage = grow_stack(((uint8_t *) PHYS_BASE) - PGSIZE);
+  // kpage = grow_stack(((uint8_t *) PHYS_BASE) - PGSIZE);
   
-  // kpage = palloc_get_page (PAL_USER | PAL_ZERO);
+  kpage = palloc_get_page (PAL_USER | PAL_ZERO);
   if (kpage != NULL) 
     {
       success = install_page (((uint8_t *) PHYS_BASE) - PGSIZE, kpage, true);
