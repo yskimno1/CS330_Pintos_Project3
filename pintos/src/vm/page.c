@@ -20,16 +20,6 @@ list_less(const struct list_elem* a, const struct list_elem* b, void* aux){
     return (spt_e_1->user_vaddr < spt_e_1->user_vaddr); // not using hash_func b/c all user_vaddr are different
 }
 
-void 
-page_init (void)
-{
-    printf("page init start\n");
-    struct thread* curr = thread_current();
-    list_init(curr->sup_page_table);
-    printf("page init done\n");
-    return;
-}
-
 /*
  * Make new supplementary page table entry for addr 
  */
@@ -54,12 +44,4 @@ grow_stack(void* addr){
         return false;
     }
     return true;
-}
-
-void
-page_done(void)
-{
-    printf("page done start\n");
-    struct thread* curr = thread_current();
-    printf("page done done\n");
 }

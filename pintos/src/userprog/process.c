@@ -65,7 +65,7 @@ process_execute (const char *file_name)
   char* func_name = strtok_r(filename_copy, " ", &saveptr);
 
   /* Create a new thread to execute FUNC_NAME. */
-  page_init();
+  list_init(thread_current()->sup_page_table);
   tid = thread_create (func_name, PRI_DEFAULT, start_process, fn_copy);
   sema_down(&thread_current()->sema_load);
 
@@ -165,7 +165,6 @@ process_exit (void)
   /* wait until parent removes the child in the list */
   sema_down(&curr->sema_exited);
 
-  page_done();
 
   /* Destroy the current process's page directory and switch back
     to the kernel-only page directory. */
