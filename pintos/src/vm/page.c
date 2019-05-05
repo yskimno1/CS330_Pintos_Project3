@@ -9,7 +9,7 @@
 #include "threads/vaddr.h"
 #include "userprog/process.h"
 
-#define LIMIT (1 << 23)
+
 /*
  * Initialize supplementary page table
  */
@@ -34,13 +34,38 @@ page_insert(struct sup_page_table_entry* spt_e){
  * Make new supplementary page table entry for addr 
  */
 struct sup_page_table_entry* 
-allocate_page (void* addr, bool access){
+allocate_page (void* addr, bool access, enum palloc_type p_type, uint32_t read_bytes, uint32_t zero_bytes, struct file *file, int32_t offset){
     struct sup_page_table_entry* spt_e = malloc(sizeof(struct sup_page_table_entry));
     if(spt_e == NULL) return NULL;
-    spt_e->user_vaddr = addr;
-    spt_e->accessed = access;
-    
+    if(p_type == GROW_STACK || p_type == PAGE_FAULT){
+        spt_e->user_vaddr = addr;
+        spt_e->accessed = access;
+    }
+    else if(p_type == LOAD_SEGMENT){
+        spt_e->user_vaddr = addr;
+        spt_e->accessed = access;
+        spt_e->read_bytes = read_bytes;
+        spt_e->zero_bytes = zero_bytes;
+        spt_e->offset = offset;
+    }
+    else ASSERT(0);
     return spt_e;
+}
+
+struct sup_page_table_entry*
+find_page(void* addr){
+    void* aligned_addr = pg_round_down(addr);
+    struct sup_page_table_entry* spt_e;
+    struct list_elem* e;
+    struct thread* curr = thread_current();
+    struct list sup_page_table = curr->sup_page_table;
+    if(!list_empty(&sup_page_table)){
+        for(e=list_begin(&sup_page_table); e!=list_end(&sup_page_table); e = list_next(e)){
+            spt_e = list_entry(e, struct sup_page_table_entry, elem);
+            if(spt_e->user_vaddr == aligned_addr) return spt_e;
+        }
+    }
+    return NULL;
 }
 
 void*
@@ -54,15 +79,21 @@ free_page(struct list_elem* e){
     free(spt_e);
 }
 
+bool
+page_handling(struct sup_page_table_entry* spt_e){
+    return swap_handling(spt_e);
+}
+
+bool
+swap_handling(struct sup_page_table_entry* spt_e){
+    return false;
+}
 
 bool
 grow_stack(void* addr){
     void* page_addr = pg_round_down(addr);
-    if((int) (PHYS_BASE - page_addr) > LIMIT){
 
-        return false;
-    }
-    struct sup_page_table_entry* spt_e = allocate_page(page_addr, true);
+    struct sup_page_table_entry* spt_e = allocate_page(page_addr, true, PAGE_FAULT, 0, 0, NULL, 0);
 
     uint8_t* frame_addr = allocate_frame(spt_e, PAL_USER);
     if(frame_addr==NULL){
@@ -85,7 +116,7 @@ grow_stack(void* addr){
 
 bool
 setup_stack_grow(void* addr){
-    struct sup_page_table_entry* spt_e = allocate_page(addr, false);
+    struct sup_page_table_entry* spt_e = allocate_page(addr, false, GROW_STACK, 0, 0, NULL, 0);
     if(spt_e==NULL){
         printf("spte null\n");
         return false;
@@ -107,7 +138,5 @@ setup_stack_grow(void* addr){
         free(spt_e);
         return false;
     }
-
-
     return true;
 }
