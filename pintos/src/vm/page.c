@@ -58,8 +58,7 @@ free_page(struct list_elem* e){
 bool
 grow_stack(void* addr){
     void* page_addr = pg_round_down(addr);
-    if(page_addr < PHYS_BASE - LIMIT){
-        printf("limit %p\n", PHYS_BASE - LIMIT);
+    if((int) (PHYS_BASE - page_addr) > LIMIT){
         ASSERT(0);
         return false;
     }
