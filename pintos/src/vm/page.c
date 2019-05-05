@@ -91,7 +91,33 @@ free_page(struct list_elem* e){
 
 bool
 page_handling(struct sup_page_table_entry* spt_e){
-    return swap_handling(spt_e);
+    // return swap_handling(spt_e);
+    return file_handling(spt_e);
+}
+
+bool
+file_handling(struct sup_page_table_entry* spt_e){
+    void* frame;
+    if(spt_e->read_bytes == 0) frame = allocate_frame(spt_e, PAL_USER|PAL_ZERO);
+    else frame = allocate_frame(spt_e, PAL_USER);
+    if(frame == NULL) return false;
+
+    /* need writable , true, kys */
+    bool success = install_page(spt_e->user_vaddr, frame, true);
+    if(success == false){
+        free_frame(frame);
+        return false;
+    }
+    /* need lock, kys */
+    if(spt_e->read_bytes != 0){
+        file_seek (spt_e->file, spt_e->offset);
+        if (file_read (spt_e->file, frame, spt_e->read_bytes) != (int) spt_e->read_bytes){
+            free_frame(frame);
+            return false; 
+        }
+        memset (frame + spt_e->read_bytes, 0, spt_e->zero_bytes);
+    }
+    return false;
 }
 
 bool
