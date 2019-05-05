@@ -101,6 +101,7 @@ swap_handling(struct sup_page_table_entry* spt_e){
 
 bool
 grow_stack(void* addr){
+    printf("grow stack start!\n");
     void* page_addr = pg_round_down(addr);
 
     struct sup_page_table_entry* spt_e = allocate_page(page_addr, true, PAGE_FAULT, 0, 0, NULL, 0);
@@ -120,12 +121,13 @@ grow_stack(void* addr){
         return false;
     }
     page_insert(spt_e);
-
+    printf("grow stack done!\n");
     return true;
 }
 
 bool
 setup_stack_grow(void* addr){
+    printf("setup stack grow start!\n");
     struct sup_page_table_entry* spt_e = allocate_page(addr, false, GROW_STACK, 0, 0, NULL, 0);
     if(spt_e==NULL){
         printf("spte null\n");
@@ -142,11 +144,13 @@ setup_stack_grow(void* addr){
     page_insert(spt_e); // can insert at front kys
 
     bool success = install_page(addr, frame_addr, true);
+    printf("Setup stack grow done!\n");
     if(success == false){
         printf("install page failed\n");
         free_frame(frame_addr);
         free(spt_e);
         return false;
     }
+
     return true;
 }
