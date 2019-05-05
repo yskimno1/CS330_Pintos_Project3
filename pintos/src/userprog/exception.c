@@ -152,7 +152,8 @@ page_fault (struct intr_frame *f)
 
   bool success = false;
   if(is_user_vaddr(fault_addr) && not_present){
-     printf("esp-32 : %p, fault : %p\n", f->esp-32, fault_addr);
+
+     printf(" fault : %p\n, esp %p, esp-32 : %p", fault_addr, f->esp, f->esp-32);
      if(fault_addr >= f->esp-32){
          success = grow_stack(fault_addr);
          if(success) return;
