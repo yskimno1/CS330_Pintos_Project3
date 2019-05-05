@@ -61,6 +61,7 @@ allocate_page (void* addr, bool access, enum palloc_type p_type, uint32_t read_b
         spt_e->offset = offset;
         spt_e->file = file;
         spt_e->writable = writable;
+        printf("read bytes : %d\n", spt_e->read_bytes);
     }
     else ASSERT(0);
     return spt_e;
@@ -101,34 +102,41 @@ page_handling(struct sup_page_table_entry* spt_e){
 
 bool
 file_handling(struct sup_page_table_entry* spt_e){
+
+
     void* frame;
+
     if(spt_e->read_bytes == 0) frame = allocate_frame(spt_e, PAL_USER|PAL_ZERO);
     else frame = allocate_frame(spt_e, PAL_USER);
     ASSERT(frame);
     if(frame == NULL) return false;
+
+    filelock_acquire();
     
     if(spt_e->read_bytes > 0){
-        
-        filelock_acquire();
-        if (file_read_at (spt_e->file, frame, spt_e->read_bytes, spt_e->offset) != (int) spt_e->read_bytes){
+
+        if (file_read (spt_e->file, frame, spt_e->read_bytes) != (int) spt_e->read_bytes){
             printf("%d vs %d\n", file_read (spt_e->file, frame, spt_e->read_bytes), (int) spt_e->read_bytes);
             free_frame(frame);
             filelock_release();
             ASSERT(0);
             return false; 
         }
-        filelock_release();
+
         memset (frame + spt_e->read_bytes, 0, spt_e->zero_bytes);
     }
+
 
     bool success = install_page(spt_e->user_vaddr, frame, spt_e->writable);
     ASSERT(success);
     if(success == false){
         free_frame(frame);
+        filelock_release();
         return false;
     }
 
     spt_e->accessed = true;
+    filelock_release();
     return true;
 }
 
