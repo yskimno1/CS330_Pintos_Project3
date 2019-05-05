@@ -153,7 +153,7 @@ page_fault (struct intr_frame *f)
 
   bool success = false;
 //   printf("fault addr : %p\n", fault_addr);
-  ASSERT(is_kernel_vaddr(fault_addr));
+
   if(is_user_vaddr(fault_addr) && not_present){
 
    //   printf(" fault : %p\n, esp %p, esp-32 : %p", fault_addr, f->esp, f->esp - SIZE);
