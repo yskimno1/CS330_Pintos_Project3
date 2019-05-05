@@ -8,9 +8,9 @@
 #include "userprog/pagedir.h"
 #include "threads/vaddr.h"
 #include "userprog/process.h"
-#include "filesys/directory.h"
+// #include "filesys/directory.h"
 #include "filesys/file.h"
-#include "filesys/filesys.h"
+// #include "filesys/filesys.h"
 
 /*
  * Initialize supplementary page table
