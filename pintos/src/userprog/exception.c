@@ -155,6 +155,7 @@ page_fault (struct intr_frame *f)
 //   printf("fault addr : %p\n", fault_addr);
 
    if(is_user_vaddr(fault_addr) && not_present){
+      printf("page fault 1, fauilt addr %p\n", fault_addr);
       struct sup_page_table_entry* spt_e = find_page(fault_addr);
       // if(spt_e != NULL){ /* there exists a page */
       //    success = page_handling(spt_e);
