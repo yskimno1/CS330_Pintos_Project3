@@ -35,7 +35,7 @@ add_page(void* addr, bool access, enum palloc_type p_type, uint32_t read_bytes, 
     struct sup_page_table_entry* spt_e;
     spt_e = allocate_page(addr, access, p_type, read_bytes, zero_bytes, file, offset);
     if(spt_e == NULL) return false;
-    printf("before page insert\n");
+    printf("before page insert, uaddr : %p\n", spt_e->user_vaddr);
     page_insert(spt_e);
     return true;
 }
