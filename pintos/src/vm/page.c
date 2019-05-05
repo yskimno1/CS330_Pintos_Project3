@@ -107,6 +107,13 @@ file_handling(struct sup_page_table_entry* spt_e){
     ASSERT(frame);
     if(frame == NULL) return false;
 
+    bool success = install_page(spt_e->user_vaddr, frame, spt_e->writable);
+    ASSERT(success);
+    if(success == false){
+        free_frame(frame);
+        return false;
+    }
+    
     if(spt_e->read_bytes > 0){
         file_seek (spt_e->file, spt_e->offset);
         filelock_acquire();
@@ -120,13 +127,7 @@ file_handling(struct sup_page_table_entry* spt_e){
         filelock_release();
         memset (frame + spt_e->read_bytes, 0, spt_e->zero_bytes);
     }
-    /* need writable , true, kys */
-    bool success = install_page(spt_e->user_vaddr, frame, spt_e->writable);
-    ASSERT(success);
-    if(success == false){
-        free_frame(frame);
-        return false;
-    }
+
     spt_e->accessed = true;
     return true;
 }
