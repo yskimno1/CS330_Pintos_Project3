@@ -103,10 +103,12 @@ file_handling(struct sup_page_table_entry* spt_e){
     void* frame;
     if(spt_e->read_bytes == 0) frame = allocate_frame(spt_e, PAL_USER|PAL_ZERO);
     else frame = allocate_frame(spt_e, PAL_USER);
+    ASSERT(frame);
     if(frame == NULL) return false;
 
     /* need writable , true, kys */
     bool success = install_page(spt_e->user_vaddr, frame, true);
+    ASSERT(success);
     if(success == false){
         free_frame(frame);
         return false;
@@ -115,7 +117,9 @@ file_handling(struct sup_page_table_entry* spt_e){
     if(spt_e->read_bytes != 0){
         file_seek (spt_e->file, spt_e->offset);
         if (file_read (spt_e->file, frame, spt_e->read_bytes) != (int) spt_e->read_bytes){
+            
             free_frame(frame);
+            ASSERT(0);
             return false; 
         }
         memset (frame + spt_e->read_bytes, 0, spt_e->zero_bytes);
