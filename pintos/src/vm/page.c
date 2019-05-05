@@ -28,8 +28,16 @@ list_less(const struct list_elem* a, const struct list_elem* b, void* aux){
 void
 page_insert(struct sup_page_table_entry* spt_e){
     struct thread* curr = thread_current();
-    struct sup_page_table_entry* temp = find_page(spt_e->user_vaddr);
-    if(temp != NULL) list_push_back(&curr->sup_page_table, &spt_e->elem);
+    printf("page insert start\n");
+    struct sup_page_table_entry* temp;
+    struct list_elem* e;
+    if(!list_empty(&curr->sup_page_table)){
+        for(e=list_begin(&curr->sup_page_table); e!=list_end(&curr->sup_page_table); e = list_next(e)){
+            temp = list_entry(e, struct sup_page_table_entry, elem);
+            if(&temp->elem == e) return;
+        }
+    }
+    list_push_back(&curr->sup_page_table, &spt_e->elem);
     //list_insert_ordered(&curr->sup_page_table, &spt_e->elem, list_less, 0);
 }
 
