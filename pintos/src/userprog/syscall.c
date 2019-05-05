@@ -39,7 +39,6 @@ static bool fd_validate(int fd);
 static bool string_validate(const char* ptr);
 static bool is_bad_pointer(const char* ptr);
 
-#define STACK_BOTTOM (void *)0x08048000
 void
 syscall_init (void) 
 {
