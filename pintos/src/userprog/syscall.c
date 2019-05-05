@@ -204,19 +204,13 @@ exit (int status){
   t->exit_status = status;
 	printf("%s: exit(%d)\n", thread_name(), status);
 	int i; 
-	printf("acquire lock\n");
-  filelock_acquire();
-	printf("acquire done\n");
-  for (i = 3; i < 131; i++) {
+	for (i = 3; i < 131; i++) {
       if (t->fdt[i] != NULL){
         file_close(t->fdt[i]);
         t->fdt[i] = NULL;
       }  
   }   
-	printf("release lock\n");
-	filelock_release();
-	printf("release done\n");
-  thread_exit ();
+	thread_exit ();
 } 
 
 pid_t 
