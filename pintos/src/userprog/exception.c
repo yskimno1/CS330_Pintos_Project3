@@ -152,7 +152,7 @@ page_fault (struct intr_frame *f)
   user = (f->error_code & PF_U) != 0;
 
   bool success = false;
-  printf("fault addr : %p\n", fault_addr);
+//   printf("fault addr : %p\n", fault_addr);
   ASSERT(is_kernel_vaddr(fault_addr));
   if(is_user_vaddr(fault_addr) && not_present){
 

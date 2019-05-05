@@ -39,6 +39,7 @@ static bool fd_validate(int fd);
 static bool string_validate(const char* ptr);
 static bool is_bad_pointer(const char* ptr);
 
+#define STACK_BOTTOM (void *)0x08048000
 void
 syscall_init (void) 
 {
@@ -181,11 +182,10 @@ syscall_handler (struct intr_frame *f)
 
 uint32_t* 
 p_argv(void* addr){
-	printf("Addr : %p\n", addr);
   if (addr==NULL){
     exit(-1);
 	}
-  if (!is_user_vaddr(addr)){
+  if (!is_user_vaddr(addr) || addr < STACK_BOTTOM){
     exit(-1);
 	}
 	if(is_bad_pointer(addr)){
