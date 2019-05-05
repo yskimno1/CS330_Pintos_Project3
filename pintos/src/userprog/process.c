@@ -400,9 +400,7 @@ load (const char *file_name, void (**eip) (void), void **esp)
 
  done:
   /* We arrive here whether the load is successful or not. */
-  printf("before close\n");
   file_close (file);
-  printf("after close\n");
   free(filename_args);
   return success;
 }
