@@ -19,7 +19,7 @@ static struct lock swap_lock;
 void 
 swap_init (void)
 {
-    disk_init();
+
     swap_device = disk_get(1,1);
     swap_table = bitmap_create(DISK_SECTOR_SIZE/PGSIZE * disk_size(swap_device)); // kys
     lock_init(&swap_lock);
