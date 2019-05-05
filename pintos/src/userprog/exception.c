@@ -151,17 +151,19 @@ page_fault (struct intr_frame *f)
   user = (f->error_code & PF_U) != 0;
 
   printf("uservaddr %d, faultaddr %p\n", is_user_vaddr(fault_addr), fault_addr);
-  bool success;
+  bool success = false;
   if(is_user_vaddr(fault_addr) && not_present){
-     success = grow_stack(fault_addr);
-
-     if(success == false){
-      printf ("Page fault at %p: %s error %s page in %s context.\n",
+     if(fault_addr >= f->esp-32){
+         success = grow_stack(fault_addr);
+         if(success) return;
+         else{
+             printf ("Page fault at %p: %s error %s page in %s context.\n",
                fault_addr,
                not_present ? "not present" : "rights violation",
                write ? "writing" : "reading",
                user ? "user" : "kernel");
-      kill (f);
+             kill (f);
+         }
      }
      return;
   }
