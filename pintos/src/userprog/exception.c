@@ -154,7 +154,7 @@ page_fault (struct intr_frame *f)
   bool success = false;
   if(is_user_vaddr(fault_addr) && not_present){
 
-     printf(" fault : %p\n, esp %p, esp-32 : %p", fault_addr, f->esp, f->esp - SIZE);
+   //   printf(" fault : %p\n, esp %p, esp-32 : %p", fault_addr, f->esp, f->esp - SIZE);
      if(fault_addr >= f->esp - SIZE){
          success = grow_stack(fault_addr);
          if(success) return;
