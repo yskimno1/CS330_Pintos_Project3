@@ -28,7 +28,6 @@ list_less(const struct list_elem* a, const struct list_elem* b, void* aux){
 void
 page_insert(struct sup_page_table_entry* spt_e){
     struct thread* curr = thread_current();
-    printf("page insert start\n");
     struct sup_page_table_entry* temp;
     struct list_elem* e;
     if(!list_empty(&curr->sup_page_table)){
@@ -37,6 +36,7 @@ page_insert(struct sup_page_table_entry* spt_e){
             if(&temp->elem == e) return;
         }
     }
+    printf("page insert start\n");
     list_push_back(&curr->sup_page_table, &spt_e->elem);
     //list_insert_ordered(&curr->sup_page_table, &spt_e->elem, list_less, 0);
 }
@@ -70,7 +70,7 @@ allocate_page (void* addr, bool access, enum palloc_type p_type, uint32_t read_b
         spt_e->offset = offset;
         spt_e->file = file;
         spt_e->writable = writable;
-        printf("read bytes : %d\n", spt_e->read_bytes);
+        printf("read bytes : %d, address %p\n", spt_e->read_bytes, spt_e->user_vaddr);
     }
     else ASSERT(0);
     return spt_e;
@@ -111,7 +111,6 @@ page_handling(struct sup_page_table_entry* spt_e){
 
 bool
 file_handling(struct sup_page_table_entry* spt_e){
-
 
     void* frame;
 
