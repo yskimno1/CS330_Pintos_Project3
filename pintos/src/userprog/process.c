@@ -483,11 +483,11 @@ load_segment (struct file *file, off_t ofs, uint8_t *upage,
       size_t page_read_bytes = read_bytes < PGSIZE ? read_bytes : PGSIZE;
       size_t page_zero_bytes = PGSIZE - page_read_bytes;
       /* Get a page of memory. */
-      uint8_t* kpage = palloc_get_page (PAL_USER);
-      if (kpage == NULL)
-        return false;
-      off_t temp = file_read(file, kpage, page_read_bytes);
-      printf("process, temp : %d\n", temp);
+      // uint8_t* kpage = palloc_get_page (PAL_USER);
+      // if (kpage == NULL)
+      //   return false;
+      // off_t temp = file_read(file, kpage, page_read_bytes);
+      // printf("process, temp : %d\n", temp);
 
       bool success;
       success = add_page(upage, false, LOAD_SEGMENT, page_read_bytes, page_zero_bytes, file, ofs, writable);
@@ -536,6 +536,7 @@ setup_stack (void **esp, int argc, void** argv)
   success = setup_stack_grow(((uint8_t* )PHYS_BASE) - PGSIZE);
   if(success){
     *esp = PHYS_BASE;
+    printf("esp : %p\n", *esp);
     /* Implementation start */
     /* copy the pointer of argv */
     
