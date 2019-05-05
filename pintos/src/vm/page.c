@@ -79,6 +79,7 @@ struct sup_page_table_entry*
 find_page(void* addr){
     void* aligned_addr = pg_round_down(addr);
     struct sup_page_table_entry* spt_e;
+
     struct list_elem* e;
     struct thread* curr = thread_current();
     struct list sup_page_table = curr->sup_page_table;
@@ -120,10 +121,20 @@ file_handling(struct sup_page_table_entry* spt_e){
 
     filelock_acquire();
     
+    bool success = install_page(spt_e->user_vaddr, frame, spt_e->writable);
+    ASSERT(success);
+    if(success == false){
+        free_frame(frame);
+        filelock_release();
+        return false;
+    }
+
     if(spt_e->read_bytes > 0){
         file_seek (spt_e->file, spt_e->offset);
-        if (file_read (spt_e->file, frame, spt_e->read_bytes) != (int) spt_e->read_bytes){
-            printf("%d vs %d\n", file_read (spt_e->file, frame, spt_e->read_bytes), (int) spt_e->read_bytes);
+        off_t temp = file_read (spt_e->file, frame, spt_e->read_bytes);
+        printf("temp : %d\n", temp);
+        if (temp != (int) spt_e->read_bytes){
+            printf("%d vs %d\n", temp, (int) spt_e->read_bytes);
             free_frame(frame);
             filelock_release();
             ASSERT(0);
@@ -134,13 +145,7 @@ file_handling(struct sup_page_table_entry* spt_e){
     }
 
 
-    bool success = install_page(spt_e->user_vaddr, frame, spt_e->writable);
-    ASSERT(success);
-    if(success == false){
-        free_frame(frame);
-        filelock_release();
-        return false;
-    }
+
 
     spt_e->accessed = true;
     filelock_release();
