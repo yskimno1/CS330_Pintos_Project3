@@ -91,7 +91,6 @@ main (void)
   malloc_init ();
   paging_init ();
   frame_init ();  
-  swap_init ();
 
   /* Segmentation. */
 #ifdef USERPROG
@@ -118,6 +117,8 @@ main (void)
   /* Initialize file system. */
   disk_init ();
   filesys_init (format_filesys);
+
+  swap_init ();
 #endif
 
   printf ("Boot complete.\n");
