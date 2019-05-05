@@ -154,27 +154,26 @@ page_fault (struct intr_frame *f)
   bool success = false;
 //   printf("fault addr : %p\n", fault_addr);
 
-  if(is_user_vaddr(fault_addr) && not_present){
-    printf("value : %d", (size_t)(PHYS_BASE - pg_round_down(fault_addr)));
-    if((size_t) (PHYS_BASE - pg_round_down(fault_addr)) > LIMIT){
-       exit(-1);
-    }
+   if(is_user_vaddr(fault_addr) && not_present){
+      if((size_t) (PHYS_BASE - pg_round_down(fault_addr)) > LIMIT){
+         exit(-1);
+      }
    //   printf(" fault : %p\n, esp %p, esp-32 : %p", fault_addr, f->esp, f->esp - SIZE);
-     if(fault_addr >= f->esp - SIZE){
+      if(fault_addr >= f->esp - SIZE){
          success = grow_stack(fault_addr);
          if(success) return;
          else{
-             printf ("Page fault at %p: %s error %s page in %s context.\n",
-               fault_addr,
-               not_present ? "not present" : "rights violation",
-               write ? "writing" : "reading",
-               user ? "user" : "kernel");
-             kill (f);
+            printf ("Page fault at %p: %s error %s page in %s context.\n",
+            fault_addr,
+            not_present ? "not present" : "rights violation",
+            write ? "writing" : "reading",
+            user ? "user" : "kernel");
+            kill (f);
          }
-     }
-     else exit(-1);
-     return;
-  }
+      }
+      else exit(-1);
+      return;
+   }
 
   if(!user){
      exit(-1);
