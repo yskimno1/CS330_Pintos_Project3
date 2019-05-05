@@ -158,18 +158,19 @@ page_fault (struct intr_frame *f)
    if(is_user_vaddr(fault_addr) && not_present){
       // printf("page fault 1, fauilt addr %p\n", fault_addr);
       struct sup_page_table_entry* spt_e = find_page(fault_addr);
-      // if(spt_e != NULL){ /* there exists a page */
-      //    success = page_handling(spt_e);
-      //    if(success) return;
-      //    else{
-      //       printf ("Page fault at %p: %s error %s page in %s context.\n",
-      //       fault_addr,
-      //       not_present ? "not present" : "rights violation",
-      //       write ? "writing" : "reading",
-      //       user ? "user" : "kernel");
-      //       kill (f);         
-      //    }
-      // }
+      if(spt_e != NULL){ /* there exists a page */
+         ASSERT(0);
+         success = page_handling(spt_e);
+         if(success) return;
+         else{
+            printf ("Page fault at %p: %s error %s page in %s context.\n",
+            fault_addr,
+            not_present ? "not present" : "rights violation",
+            write ? "writing" : "reading",
+            user ? "user" : "kernel");
+            kill (f);         
+         }
+      }
       if((size_t) (PHYS_BASE - pg_round_down(fault_addr)) > LIMIT){
          ASSERT(0);
          exit(-1);
