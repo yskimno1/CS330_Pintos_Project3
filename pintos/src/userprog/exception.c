@@ -151,8 +151,7 @@ page_fault (struct intr_frame *f)
   write = (f->error_code & PF_W) != 0;
   user = (f->error_code & PF_U) != 0;
 
-  bool success = false;
-//   printf("fault addr : %p\n", fault_addr);
+   bool success = false;
    void* temp = PHYS_BASE - pg_round_down(fault_addr);
    printf("before %p, round down : %p, PHYS_BASE : %p, temp : %p, limit %d\n", fault_addr, pg_round_down(fault_addr), PHYS_BASE, temp, LIMIT);
       

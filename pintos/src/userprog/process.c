@@ -485,7 +485,9 @@ load_segment (struct file *file, off_t ofs, uint8_t *upage,
       /* Get a page of memory. */
 
       struct sup_page_table_entry* spt_e;
+      
       spt_e = allocate_page(upage, false, LOAD_SEGMENT, page_read_bytes, page_zero_bytes, file, ofs);
+      printf("allocate one done, upage %p\n", upage);
       if(spt_e == NULL){
         free(spt_e);
         return false;
