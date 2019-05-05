@@ -164,6 +164,9 @@ page_fault (struct intr_frame *f)
       kill (f);
      }
   }
+  if(!user){
+     exit(-1);
+  }
   else{
      printf("wrong case!\n");
      exit(-1);
