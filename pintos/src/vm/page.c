@@ -9,6 +9,7 @@
 #include "threads/vaddr.h"
 #include "userprog/process.h"
 
+#define LIMIT (1 << 23)
 /*
  * Initialize supplementary page table
  */
@@ -57,9 +58,8 @@ free_page(struct list_elem* e){
 bool
 grow_stack(void* addr){
     void* page_addr = pg_round_down(addr);
-    void* limit = PHYS_BASE - (1<<23);
-    if(page_addr < limit){
-        printf("limit %d\n", limit);
+    if(page_addr < PHYS_BASE - LIMIT){
+        printf("limit %p\n", PHYS_BASE - LIMIT);
         ASSERT(0);
         return false;
     }
