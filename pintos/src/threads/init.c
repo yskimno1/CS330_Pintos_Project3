@@ -121,7 +121,7 @@ main (void)
 
 
 #endif
-  swap_init ();
+  // swap_init ();
   printf ("Boot complete.\n");
   
   /* Run actions specified on kernel command line. */
