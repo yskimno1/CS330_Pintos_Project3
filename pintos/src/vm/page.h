@@ -6,7 +6,7 @@
 #define VM_PAGE_H
 
 // struct list sup_page_table;
-
+#define LIMIT (1 << 23)
 struct sup_page_table_entry 
 {
 	uint32_t* user_vaddr;

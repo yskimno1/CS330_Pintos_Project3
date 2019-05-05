@@ -59,7 +59,7 @@ bool
 grow_stack(void* addr){
     void* page_addr = pg_round_down(addr);
     if((int) (PHYS_BASE - page_addr) > LIMIT){
-        ASSERT(0);
+
         return false;
     }
     struct sup_page_table_entry* spt_e = allocate_page(page_addr, true);
