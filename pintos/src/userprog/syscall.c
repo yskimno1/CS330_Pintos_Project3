@@ -251,19 +251,21 @@ int open (const char *file){
   if (!string_validate(file) || strlen(file)>14)
     return -1;
 	filelock_acquire();
-
+	printf("acquired file lock\n");
 	struct file* f = filesys_open(file);
 	if (f == NULL) {
+		printf("release filelock 2\n");
 		filelock_release();
 		return -1;
 	}
-
+	printf("release filelock 3\n");
+  filelock_release();
   struct thread *t = thread_current();
   int fd = (t->fd_vld)++;
   t->fdt[fd] = f;
   if (!strcmp(t->name, file)) 
       file_deny_write(f);
-  filelock_release();
+
   return fd; 
 }
 
