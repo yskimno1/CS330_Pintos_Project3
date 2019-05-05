@@ -28,12 +28,10 @@ list_less(const struct list_elem* a, const struct list_elem* b, void* aux){
 bool
 page_insert(struct sup_page_table_entry* spt_e){
     struct thread* curr = thread_current();
-    struct sup_page_table_entry* temp;
     struct list_elem* e;
     if(!list_empty(&curr->sup_page_table)){
         for(e=list_begin(&curr->sup_page_table); e!=list_end(&curr->sup_page_table); e = list_next(e)){
-            temp = list_entry(e, struct sup_page_table_entry, elem);
-            if(&temp->elem == e) return false;
+            if(e == &spt_e->elem) return false;
         }
     }
     printf("page insert start\n");
