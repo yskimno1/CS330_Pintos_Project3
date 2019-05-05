@@ -484,16 +484,13 @@ load_segment (struct file *file, off_t ofs, uint8_t *upage,
       size_t page_zero_bytes = PGSIZE - page_read_bytes;
       /* Get a page of memory. */
 
-      struct sup_page_table_entry* spt_e;
-      
-      spt_e = allocate_page(upage, false, LOAD_SEGMENT, page_read_bytes, page_zero_bytes, file, ofs);
-      printf("allocate one done, upage %p\n", upage);
-      if(spt_e == NULL){
-        free(spt_e);
+      bool success;
+      success = add_page(upage, false, LOAD_SEGMENT, page_read_bytes, page_zero_bytes, file, ofs);
+      if(success == false){
+        printf("success false\n" );
         return false;
       }
-      page_insert(spt_e);
-      
+
       // uint8_t* kpage = palloc_get_page (PAL_USER);
       // if (kpage == NULL)
       //   return false;

@@ -30,6 +30,16 @@ page_insert(struct sup_page_table_entry* spt_e){
     //list_insert_ordered(&curr->sup_page_table, &spt_e->elem, list_less, 0);
 }
 
+bool
+add_page(void* addr, bool access, enum palloc_type p_type, uint32_t read_bytes, uint32_t zero_bytes, struct file *file, int32_t offset){
+    struct sup_page_table_entry* spt_e;
+    spt_e = allocate_page(addr, access, p_type, read_bytes, zero_bytes, file, offset);
+    if(spt_e == NULL) return false;
+    printf("before page insert\n");
+    page_insert(spt_e);
+    return true;
+}
+
 /*
  * Make new supplementary page table entry for addr 
  */
