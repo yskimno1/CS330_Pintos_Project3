@@ -59,6 +59,7 @@ grow_stack(void* addr){
     void* page_addr = pg_round_down(addr);
     void* limit = PHYS_BASE - (1<<23);
     if(page_addr < limit){
+        printf("limit %d\n", limit);
         ASSERT(0);
         return false;
     }
