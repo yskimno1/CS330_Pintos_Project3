@@ -484,9 +484,7 @@ load_segment (struct file *file, off_t ofs, uint8_t *upage,
       size_t page_zero_bytes = PGSIZE - page_read_bytes;
       /* Get a page of memory. */
 
-      uint8_t* kpage;
       struct sup_page_table_entry* spt_e;
-      printf("uaddr : %p\n", upage);
       spt_e = allocate_page(upage, false, LOAD_SEGMENT, page_read_bytes, page_zero_bytes, file, ofs);
       if(spt_e == NULL){
         free(spt_e);
@@ -494,7 +492,7 @@ load_segment (struct file *file, off_t ofs, uint8_t *upage,
       }
       page_insert(spt_e);
       
-      // kpage = palloc_get_page (PAL_USER);
+      // uint8_t* kpage = palloc_get_page (PAL_USER);
       // if (kpage == NULL)
       //   return false;
 
