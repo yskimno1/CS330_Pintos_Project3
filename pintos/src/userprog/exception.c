@@ -155,7 +155,7 @@ page_fault (struct intr_frame *f)
 //   printf("fault addr : %p\n", fault_addr);
 
   if(is_user_vaddr(fault_addr) && not_present){
-    printf("value : %d", (int)(PHYS_BASE - pg_round_down(fault_addr)));
+    printf("value : %p", (PHYS_BASE - pg_round_down(fault_addr)));
     if((int) (PHYS_BASE - pg_round_down(fault_addr)) > LIMIT){
        exit(-1);
     }
