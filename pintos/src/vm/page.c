@@ -108,7 +108,7 @@ file_handling(struct sup_page_table_entry* spt_e){
     if(frame == NULL) return false;
 
     if(spt_e->read_bytes > 0){
-        // file_seek (spt_e->file, spt_e->offset);
+        file_seek (spt_e->file, spt_e->offset);
         filelock_acquire();
         if (file_read (spt_e->file, frame, spt_e->read_bytes) != (int) spt_e->read_bytes){
             printf("%d vs %d\n", file_read (spt_e->file, frame, spt_e->read_bytes), (int) spt_e->read_bytes);
