@@ -263,9 +263,10 @@ int open (const char *file){
   struct thread *t = thread_current();
   int fd = (t->fd_vld)++;
   t->fdt[fd] = f;
+	printf("before done\n");
   if (!strcmp(t->name, file)) 
       file_deny_write(f);
-
+	printf("open done\n");
   return fd; 
 }
 
