@@ -169,6 +169,8 @@ page_fault (struct intr_frame *f)
       //       kill (f);         
       //    }
       // }
+      size_t temp = (size_t)(PHYS_BASE - pg_round_down(fault_addr));
+      printf("temp : %d\n", temp);
       if((size_t) (PHYS_BASE - pg_round_down(fault_addr)) > LIMIT){
          ASSERT(0);
          exit(-1);
