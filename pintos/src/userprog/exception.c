@@ -150,9 +150,9 @@ page_fault (struct intr_frame *f)
   write = (f->error_code & PF_W) != 0;
   user = (f->error_code & PF_U) != 0;
 
-  printf("uservaddr %d, faultaddr %p\n", is_user_vaddr(fault_addr), fault_addr);
   bool success = false;
   if(is_user_vaddr(fault_addr) && not_present){
+     printf("esp-32 : %p, fault : %p\n", f->esp-32, fault_addr);
      if(fault_addr >= f->esp-32){
          success = grow_stack(fault_addr);
          if(success) return;
