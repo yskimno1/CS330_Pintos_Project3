@@ -91,7 +91,8 @@ main (void)
   malloc_init ();
   paging_init ();
   frame_init ();  
-  swap_init();
+  swap_init ();
+
   /* Segmentation. */
 #ifdef USERPROG
   tss_init ();
