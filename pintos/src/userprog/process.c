@@ -576,6 +576,7 @@ setup_stack (void **esp, int argc, void** argv)
     *esp = *esp - sizeof(void* );
     memcpy(*esp, &return_addr, sizeof(void*));
 
+    printf("stack done\n");
     // hex_dump(*esp-4, *esp-4, 100, 1);
   }
   else{
