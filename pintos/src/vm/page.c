@@ -120,7 +120,7 @@ file_handling(struct sup_page_table_entry* spt_e){
         }
         memset (frame + spt_e->read_bytes, 0, spt_e->zero_bytes);
     }
-    return false;
+    return true;
 }
 
 bool
