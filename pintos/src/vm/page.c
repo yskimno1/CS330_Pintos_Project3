@@ -58,7 +58,6 @@ bool
 grow_stack(void* addr){
     void* page_addr = pg_round_down(addr);
     void* limit = PHYS_BASE - (1<<23);
-    printf("page addr : %p, limit %p\n", page_addr, limit);
     if(page_addr < limit) return false;
     struct sup_page_table_entry* spt_e = allocate_page(page_addr, true);
 
