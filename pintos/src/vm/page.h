@@ -32,7 +32,7 @@ enum palloc_type{
 };
 bool add_page(void* addr, bool access, enum palloc_type p_type, uint32_t read_bytes, uint32_t zero_bytes, struct file *file, int32_t offset, bool writable);
 bool list_less(const struct list_elem* a, const struct list_elem* b, void* aux);
-void page_insert(struct sup_page_table_entry* spt_e);
+bool page_insert(struct sup_page_table_entry* spt_e);
 void page_init (void);
 struct sup_page_table_entry*  allocate_page(void *addr, bool access, enum palloc_type p_type, uint32_t read_bytes, uint32_t zero_bytes, struct file *file, int32_t offset, bool writable);
 void page_done(void);

@@ -25,7 +25,7 @@ list_less(const struct list_elem* a, const struct list_elem* b, void* aux){
     return (spt_e_1->user_vaddr < spt_e_1->user_vaddr); // not using hash_func b/c all user_vaddr are different
 }
 
-void
+bool
 page_insert(struct sup_page_table_entry* spt_e){
     struct thread* curr = thread_current();
     struct sup_page_table_entry* temp;
@@ -33,11 +33,12 @@ page_insert(struct sup_page_table_entry* spt_e){
     if(!list_empty(&curr->sup_page_table)){
         for(e=list_begin(&curr->sup_page_table); e!=list_end(&curr->sup_page_table); e = list_next(e)){
             temp = list_entry(e, struct sup_page_table_entry, elem);
-            if(&temp->elem == e) return;
+            if(&temp->elem == e) return false;
         }
     }
     printf("page insert start\n");
     list_push_back(&curr->sup_page_table, &spt_e->elem);
+    return true;
     //list_insert_ordered(&curr->sup_page_table, &spt_e->elem, list_less, 0);
 }
 
@@ -46,9 +47,9 @@ add_page(void* addr, bool access, enum palloc_type p_type, uint32_t read_bytes, 
     struct sup_page_table_entry* spt_e;
     spt_e = allocate_page(addr, access, p_type, read_bytes, zero_bytes, file, offset, writable);
     if(spt_e == NULL) return false;
-    // printf("before page insert, uaddr : %p\n", spt_e->user_vaddr);
-    page_insert(spt_e);
-    return true;
+
+    bool success = page_insert(spt_e);
+    return success;
 }
 
 /*
@@ -70,7 +71,7 @@ allocate_page (void* addr, bool access, enum palloc_type p_type, uint32_t read_b
         spt_e->offset = offset;
         spt_e->file = file;
         spt_e->writable = writable;
-        printf("read bytes : %d, address %p\n", spt_e->read_bytes, spt_e->user_vaddr);
+        printf("read bytes : %d, offset %d, address %p\n", spt_e->read_bytes, spt_e->offset, spt_e->user_vaddr);
     }
     else ASSERT(0);
     return spt_e;
@@ -155,7 +156,7 @@ swap_handling(struct sup_page_table_entry* spt_e){
 
 bool
 grow_stack(void* addr){
-    printf("grow stack start!\n");
+
     void* page_addr = pg_round_down(addr);
 
     struct sup_page_table_entry* spt_e = allocate_page(page_addr, true, PAGE_FAULT, 0, 0, NULL, 0, 0);
@@ -174,9 +175,8 @@ grow_stack(void* addr){
         free(spt_e);
         return false;
     }
-    page_insert(spt_e);
-    printf("grow stack done!\n");
-    return true;
+    success = page_insert(spt_e);
+    return success;
 }
 
 bool
@@ -195,9 +195,10 @@ setup_stack_grow(void* addr){
         return false;
     }
     spt_e->accessed = true;
-    page_insert(spt_e); // can insert at front kys
+    bool success = page_insert(spt_e); // can insert at front kys
+    ASSERT(success);
 
-    bool success = install_page(addr, frame_addr, true);
+    success = install_page(addr, frame_addr, true);
     printf("Setup stack grow done!\n");
     if(success == false){
         printf("install page failed\n");
