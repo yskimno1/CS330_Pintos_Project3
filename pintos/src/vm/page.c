@@ -106,23 +106,26 @@ file_handling(struct sup_page_table_entry* spt_e){
     ASSERT(frame);
     if(frame == NULL) return false;
 
+    /* need lock, kys */
+    if(spt_e->read_bytes > 0){
+        // file_seek (spt_e->file, spt_e->offset);
+        filelock_acquire();
+        if (file_read (spt_e->file, frame, spt_e->read_bytes) != (int) spt_e->read_bytes){
+            printf("%d vs %d\n", file_read (spt_e->file, frame, spt_e->read_bytes), (int) spt_e->read_bytes);
+            free_frame(frame);
+            filelock_release();
+            ASSERT(0);
+            return false; 
+        }
+        filelock_release();
+        memset (frame + spt_e->read_bytes, 0, spt_e->zero_bytes);
+    }
     /* need writable , true, kys */
     bool success = install_page(spt_e->user_vaddr, frame, true);
     ASSERT(success);
     if(success == false){
         free_frame(frame);
         return false;
-    }
-    /* need lock, kys */
-    if(spt_e->read_bytes > 0){
-        file_seek (spt_e->file, spt_e->offset);
-        if (file_read (spt_e->file, frame, spt_e->read_bytes) != (int) spt_e->read_bytes){
-            printf("%d vs %d\n", file_read (spt_e->file, frame, spt_e->read_bytes), (int) spt_e->read_bytes);
-            free_frame(frame);
-            ASSERT(0);
-            return false; 
-        }
-        memset (frame + spt_e->read_bytes, 0, spt_e->zero_bytes);
     }
     spt_e->accessed = true;
     return true;
