@@ -152,6 +152,8 @@ page_fault (struct intr_frame *f)
   user = (f->error_code & PF_U) != 0;
 
   bool success = false;
+  printf("fault addr : %p\n", fault_addr);
+  ASSERT(is_kernel_vaddr(fault_addr));
   if(is_user_vaddr(fault_addr) && not_present){
 
    //   printf(" fault : %p\n, esp %p, esp-32 : %p", fault_addr, f->esp, f->esp - SIZE);
@@ -175,7 +177,7 @@ page_fault (struct intr_frame *f)
      exit(-1);
   }
   else{
-     printf("wrong case!\n");
+   //   printf("wrong case!\n");
      exit(-1);
   }
 //   exit(-1);
