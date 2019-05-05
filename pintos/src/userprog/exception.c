@@ -159,7 +159,6 @@ page_fault (struct intr_frame *f)
       struct sup_page_table_entry* spt_e = find_page(fault_addr);
       if(spt_e != NULL){ /* there exists a page */
 
-         ASSERT(spt_e->file != NULL);
          success = page_handling(spt_e);
          if(success) return;
          else{
