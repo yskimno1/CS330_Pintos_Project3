@@ -54,7 +54,7 @@ add_page(void* addr, bool access, enum palloc_type p_type, uint32_t read_bytes, 
  * Make new supplementary page table entry for addr 
  */
 struct sup_page_table_entry* 
-allocate_page (void* addr, bool access, enum palloc_type p_type, uint32_t read_bytes, uint32_t zero_bytes, struct file *file, int32_t offset, bool writable){
+allocate_page (void* addr, bool access, enum palloc_type p_type, uint32_t read_bytes, uint32_t zero_bytes, struct file* file, int32_t offset, bool writable){
     struct sup_page_table_entry* spt_e = malloc(sizeof(struct sup_page_table_entry));
     if(spt_e == NULL) return NULL;
     if(p_type == GROW_STACK || p_type == PAGE_FAULT){
@@ -69,7 +69,7 @@ allocate_page (void* addr, bool access, enum palloc_type p_type, uint32_t read_b
         spt_e->offset = offset;
         spt_e->file = file;
         spt_e->writable = writable;
-        printf("read bytes : %d, offset %d, address %p\n", spt_e->read_bytes, spt_e->offset, spt_e->user_vaddr);
+        printf("read bytes : %d, offset %d, address %p, file %p\n", spt_e->read_bytes, spt_e->offset, spt_e->user_vaddr, file);
     }
     else ASSERT(0);
     return spt_e;
