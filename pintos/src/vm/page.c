@@ -33,9 +33,9 @@ page_insert(struct sup_page_table_entry* spt_e){
 }
 
 bool
-add_page(void* addr, bool access, enum palloc_type p_type, uint32_t read_bytes, uint32_t zero_bytes, struct file *file, int32_t offset){
+add_page(void* addr, bool access, enum palloc_type p_type, uint32_t read_bytes, uint32_t zero_bytes, struct file *file, int32_t offset, bool writable){
     struct sup_page_table_entry* spt_e;
-    spt_e = allocate_page(addr, access, p_type, read_bytes, zero_bytes, file, offset);
+    spt_e = allocate_page(addr, access, p_type, read_bytes, zero_bytes, file, offset, writable);
     if(spt_e == NULL) return false;
     // printf("before page insert, uaddr : %p\n", spt_e->user_vaddr);
     page_insert(spt_e);
@@ -46,7 +46,7 @@ add_page(void* addr, bool access, enum palloc_type p_type, uint32_t read_bytes, 
  * Make new supplementary page table entry for addr 
  */
 struct sup_page_table_entry* 
-allocate_page (void* addr, bool access, enum palloc_type p_type, uint32_t read_bytes, uint32_t zero_bytes, struct file *file, int32_t offset){
+allocate_page (void* addr, bool access, enum palloc_type p_type, uint32_t read_bytes, uint32_t zero_bytes, struct file *file, int32_t offset, bool writable){
     struct sup_page_table_entry* spt_e = malloc(sizeof(struct sup_page_table_entry));
     if(spt_e == NULL) return NULL;
     if(p_type == GROW_STACK || p_type == PAGE_FAULT){
@@ -60,6 +60,7 @@ allocate_page (void* addr, bool access, enum palloc_type p_type, uint32_t read_b
         spt_e->zero_bytes = zero_bytes;
         spt_e->offset = offset;
         spt_e->file = file;
+        spt_e->writable = writable;
     }
     else ASSERT(0);
     return spt_e;
@@ -106,7 +107,6 @@ file_handling(struct sup_page_table_entry* spt_e){
     ASSERT(frame);
     if(frame == NULL) return false;
 
-    /* need lock, kys */
     if(spt_e->read_bytes > 0){
         // file_seek (spt_e->file, spt_e->offset);
         filelock_acquire();
@@ -121,7 +121,7 @@ file_handling(struct sup_page_table_entry* spt_e){
         memset (frame + spt_e->read_bytes, 0, spt_e->zero_bytes);
     }
     /* need writable , true, kys */
-    bool success = install_page(spt_e->user_vaddr, frame, true);
+    bool success = install_page(spt_e->user_vaddr, frame, spt_e->writable);
     ASSERT(success);
     if(success == false){
         free_frame(frame);
@@ -141,7 +141,7 @@ grow_stack(void* addr){
     printf("grow stack start!\n");
     void* page_addr = pg_round_down(addr);
 
-    struct sup_page_table_entry* spt_e = allocate_page(page_addr, true, PAGE_FAULT, 0, 0, NULL, 0);
+    struct sup_page_table_entry* spt_e = allocate_page(page_addr, true, PAGE_FAULT, 0, 0, NULL, 0, 0);
 
     uint8_t* frame_addr = allocate_frame(spt_e, PAL_USER);
     if(frame_addr==NULL){
@@ -165,7 +165,7 @@ grow_stack(void* addr){
 bool
 setup_stack_grow(void* addr){
     printf("setup stack grow start!\n");
-    struct sup_page_table_entry* spt_e = allocate_page(addr, false, GROW_STACK, 0, 0, NULL, 0);
+    struct sup_page_table_entry* spt_e = allocate_page(addr, false, GROW_STACK, 0, 0, NULL, 0, 0);
     if(spt_e==NULL){
         printf("spte null\n");
         return false;

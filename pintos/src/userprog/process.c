@@ -485,7 +485,7 @@ load_segment (struct file *file, off_t ofs, uint8_t *upage,
       /* Get a page of memory. */
 
       bool success;
-      success = add_page(upage, false, LOAD_SEGMENT, page_read_bytes, page_zero_bytes, file, ofs);
+      success = add_page(upage, false, LOAD_SEGMENT, page_read_bytes, page_zero_bytes, file, ofs, writable);
       if(success == false){
         printf("success false\n" );
         return false;
