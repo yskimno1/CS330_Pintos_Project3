@@ -153,7 +153,9 @@ page_fault (struct intr_frame *f)
 
   bool success = false;
 //   printf("fault addr : %p\n", fault_addr);
-
+   void* temp = PHYS_BASE - pg_round_down(fault_addr);
+   printf("round down : %p, PHYS_BASE : %p, temp : %d, limit %d\n", pg_round_down(fault_addr), PHYS_BASE, temp, LIMIT);
+      
    if(is_user_vaddr(fault_addr) && not_present){
       // printf("page fault 1, fauilt addr %p\n", fault_addr);
       struct sup_page_table_entry* spt_e = find_page(fault_addr);
@@ -169,8 +171,6 @@ page_fault (struct intr_frame *f)
       //       kill (f);         
       //    }
       // }
-      size_t temp = (size_t)(PHYS_BASE - pg_round_down(fault_addr));
-      printf("round down : %p, PHYS_BASE : %p, temp : %d, limit %d\n", pg_round_down(fault_addr), PHYS_BASE, temp, LIMIT);
       if((size_t) (PHYS_BASE - pg_round_down(fault_addr)) > LIMIT){
          ASSERT(0);
          exit(-1);

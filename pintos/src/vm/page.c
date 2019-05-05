@@ -36,7 +36,6 @@ page_insert(struct sup_page_table_entry* spt_e){
 struct sup_page_table_entry* 
 allocate_page (void* addr, bool access, enum palloc_type p_type, uint32_t read_bytes, uint32_t zero_bytes, struct file *file, int32_t offset){
     struct sup_page_table_entry* spt_e = malloc(sizeof(struct sup_page_table_entry));
-    printf("malloc done\n");
     if(spt_e == NULL) return NULL;
     if(p_type == GROW_STACK || p_type == PAGE_FAULT){
         spt_e->user_vaddr = addr;
