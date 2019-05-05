@@ -529,7 +529,6 @@ setup_stack (void **esp, int argc, void** argv)
   // success = setup_stack_grow(((uint8_t *) PHYS_BASE) - PGSIZE);
 
   success = setup_stack_grow(((uint8_t* )PHYS_BASE) - PGSIZE);
-  printf("success : %d\n", success);
   if(success){
     *esp = PHYS_BASE;
     /* Implementation start */
