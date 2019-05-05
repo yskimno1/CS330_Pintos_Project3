@@ -13,6 +13,7 @@ static long long page_fault_cnt;
 static void kill (struct intr_frame *);
 static void page_fault (struct intr_frame *);
 
+#define SIZE 32
 /* Registers handlers for interrupts that can be caused by user
    programs.
 
@@ -153,8 +154,8 @@ page_fault (struct intr_frame *f)
   bool success = false;
   if(is_user_vaddr(fault_addr) && not_present){
 
-     printf(" fault : %p\n, esp %p, esp-32 : %p", fault_addr, f->esp, f->esp-32);
-     if(fault_addr >= f->esp-32){
+     printf(" fault : %p\n, esp %p, esp-32 : %p", fault_addr, f->esp, f->esp - SIZE);
+     if(fault_addr >= f->esp - SIZE){
          success = grow_stack(fault_addr);
          if(success) return;
          else{
@@ -166,6 +167,7 @@ page_fault (struct intr_frame *f)
              kill (f);
          }
      }
+     else exit(-1);
      return;
   }
 
