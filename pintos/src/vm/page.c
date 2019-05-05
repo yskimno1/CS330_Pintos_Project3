@@ -54,6 +54,7 @@ allocate_page (void* addr, bool access, enum palloc_type p_type, uint32_t read_b
         spt_e->accessed = access;
     }
     else if(p_type == LOAD_SEGMENT){
+        printf("came 0\n");
         spt_e->user_vaddr = addr;
         spt_e->accessed = access;
         spt_e->read_bytes = read_bytes;
