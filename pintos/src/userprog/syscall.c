@@ -204,15 +204,18 @@ exit (int status){
   t->exit_status = status;
 	printf("%s: exit(%d)\n", thread_name(), status);
 	int i; 
+	printf("acquire lock\n");
   filelock_acquire();
+	printf("acquire done\n");
   for (i = 3; i < 131; i++) {
       if (t->fdt[i] != NULL){
         file_close(t->fdt[i]);
         t->fdt[i] = NULL;
       }  
   }   
-
+	printf("release lock\n");
 	filelock_release();
+	printf("release done\n");
   thread_exit ();
 } 
 
@@ -251,22 +254,22 @@ int open (const char *file){
   if (!string_validate(file) || strlen(file)>14)
     return -1;
 	filelock_acquire();
-	printf("acquired file lock\n");
+
 	struct file* f = filesys_open(file);
 	if (f == NULL) {
-		printf("release filelock 2\n");
+
 		filelock_release();
 		return -1;
 	}
-	printf("release filelock 3\n");
+
   filelock_release();
   struct thread *t = thread_current();
   int fd = (t->fd_vld)++;
   t->fdt[fd] = f;
-	printf("before done\n");
+
   if (!strcmp(t->name, file)) 
       file_deny_write(f);
-	printf("open done\n");
+
   return fd; 
 }
 
