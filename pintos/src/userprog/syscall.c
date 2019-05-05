@@ -254,7 +254,7 @@ int open (const char *file){
   if (!string_validate(file) || strlen(file)>14)
     return -1;
 	filelock_acquire();
-
+	
 	struct file* f = filesys_open(file);
 	if (f == NULL) {
 
