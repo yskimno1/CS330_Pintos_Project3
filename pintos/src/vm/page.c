@@ -37,12 +37,13 @@ page_insert(struct sup_page_table_entry* spt_e){
             struct sup_page_table_entry* temp = list_entry(e, struct sup_page_table_entry, elem);
             if(temp->user_vaddr == spt_e->user_vaddr){
                 // ASSERT(0);
+                printf("same!\n");
                 return false;
             }
         }
     }
     list_push_back(&curr->sup_page_table, &spt_e->elem);
-
+    printf("inserted! current length : %d, table address %p\n", list_size(&curr->sup_page_table), curr->sup_page_table);
     return true;
     //list_insert_ordered(&curr->sup_page_table, &spt_e->elem, list_less, 0);
 }
@@ -85,6 +86,7 @@ find_page(void* addr){
     struct list_elem* e;
     struct thread* curr = thread_current();
     struct list sup_page_table = curr->sup_page_table;
+    printf("finding page address %p\n", sup_page_table);
     if(!list_empty(&sup_page_table)){
         for(e=list_begin(&sup_page_table); e!=list_end(&sup_page_table); e = list_next(e)){
             spt_e = list_entry(e, struct sup_page_table_entry, elem);

@@ -159,9 +159,10 @@ page_fault (struct intr_frame *f)
       
    if(is_user_vaddr(fault_addr) && not_present){
       lock_acquire(&lock_frame);
+      printf("list size : %d\n", list_size(&thread_current()->sup_page_table));
       struct sup_page_table_entry* spt_e = find_page(fault_addr);
       if(spt_e != NULL){ /* there exists a page */
-         // printf("spt_e : addr %p, offset %d, read bytes %d\n", spt_e->user_vaddr, spt_e->offset, spt_e->read_bytes);
+         printf("spt_e : addr %p, offset %d, read bytes %d\n", spt_e->user_vaddr, spt_e->offset, spt_e->read_bytes);
          
          success = page_handling(spt_e);
          if(success){
