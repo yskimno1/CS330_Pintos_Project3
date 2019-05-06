@@ -121,12 +121,12 @@ bool
 file_handling(struct sup_page_table_entry* spt_e){
 
     void* frame;
-    filelock_acquire();
+
     if(spt_e->read_bytes == 0) frame = allocate_frame(spt_e, PAL_USER|PAL_ZERO);
     else frame = allocate_frame(spt_e, PAL_USER);
     ASSERT(frame);
     if(frame == NULL){
-        filelock_release();
+
         return false;
     }
 
@@ -134,7 +134,7 @@ file_handling(struct sup_page_table_entry* spt_e){
     ASSERT(success);
     if(success == false){
         free_frame(frame);
-        filelock_release();
+
         return false;
     }
 
@@ -144,7 +144,7 @@ file_handling(struct sup_page_table_entry* spt_e){
         if (temp != (int) spt_e->read_bytes){
             // printf("%d vs %d\n", temp, (int) spt_e->read_bytes);
             free_frame(frame);
-            filelock_release();
+
             ASSERT(0);
             return false; 
         }
@@ -153,7 +153,7 @@ file_handling(struct sup_page_table_entry* spt_e){
     }
 
     spt_e->accessed = true;
-    filelock_release();
+
     return true;
 }
 
