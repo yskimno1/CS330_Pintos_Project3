@@ -189,9 +189,9 @@ p_argv(void* addr){
   if (!is_user_vaddr(addr) || addr < STACK_BOTTOM){
     exit(-1);
 	}
-	if(is_bad_pointer(addr)){
-		exit(-1);
-	}
+	// if(is_bad_pointer(addr)){
+	// 	exit(-1);
+	// }
 
   return (uint32_t *)(addr);
 }
@@ -292,17 +292,13 @@ int read (int fd, void *buffer, unsigned size, void* esp){
     return -1;
 	}
 	void* ptr = buffer;
-	for(;ptr<buffer+size; i++){
-		if(ptr >= esp - 32){
-			bool success = grow_stack(ptr);
-			if(success == false) exit(-1);
+	for(;ptr<buffer+size; ptr++){
+		if (is_bad_pointer(ptr)){
+			filelock_release();
+			exit(-1);
+			return -1;
 		}
 	}
-	// if (is_bad_pointer(buffer+size)){
-	// 	filelock_release();
-	// 	exit(-1);
-	// 	return -1;
-	// }
 
 	if (fd == 0){			//keyboard input
 		for (i=0; i<size; i++) {
@@ -414,7 +410,7 @@ bool
 is_bad_pointer(const char* ptr){
 	void* ptr_page = pagedir_get_page(thread_current()->pagedir, ptr);
 	if(!ptr_page){
-		printf("bad pointer\n");
+		printf("bad pointer at %p\n", ptr);
 		return true;
 	}
 	else return false;
