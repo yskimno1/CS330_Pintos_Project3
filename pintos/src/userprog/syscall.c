@@ -183,16 +183,14 @@ uint32_t*
 p_argv(void* addr){
 	// printf("addr : %p\n", addr);
   if (addr==NULL){
-		printf("there\n");
     exit(-1);
 	}
   if (!is_user_vaddr(addr) || addr < STACK_BOTTOM){
-		printf("here\n");
     exit(-1);
 	}
-	if(is_bad_pointer(addr)){
-		exit(-1);
-	}
+	// if(is_bad_pointer(addr)){
+	// 	exit(-1);
+	// }
   return (uint32_t *)(addr);
 }
 
