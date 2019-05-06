@@ -37,13 +37,13 @@ page_insert(struct sup_page_table_entry* spt_e){
             struct sup_page_table_entry* temp = list_entry(e, struct sup_page_table_entry, elem);
             if(temp->user_vaddr == spt_e->user_vaddr){
                 // ASSERT(0);
-                printf("same!\n");
+                // printf("same!\n");
                 return false;
             }
         }
     }
     list_push_back(&curr->sup_page_table, &spt_e->elem);
-    printf("inserted! current length : %d, table address %p\n", list_size(&curr->sup_page_table), &curr->sup_page_table);
+    // printf("inserted! current length : %d, table address %p\n", list_size(&curr->sup_page_table), &curr->sup_page_table);
     return true;
     //list_insert_ordered(&curr->sup_page_table, &spt_e->elem, list_less, 0);
 }
@@ -79,18 +79,18 @@ allocate_page (void* addr, bool access, enum palloc_type p_type, uint32_t read_b
 
 struct sup_page_table_entry*
 find_page(void* addr){
-    printf("Addr : %p\n", addr);
+    // printf("Addr : %p\n", addr);
     void* aligned_addr = pg_round_down(addr);
     struct sup_page_table_entry* spt_e;
-    printf("aligned : %p\n", aligned_addr);
+    // printf("aligned : %p\n", aligned_addr);
     struct list_elem* e;
     struct thread* curr = thread_current();
 
-    printf("finding page address %p\n", &curr->sup_page_table);
+    // printf("finding page address %p\n", &curr->sup_page_table);
     if(!list_empty(&curr->sup_page_table)){
         for(e=list_begin(&curr->sup_page_table); e!=list_end(&curr->sup_page_table); e = list_next(e)){
             spt_e = list_entry(e, struct sup_page_table_entry, elem);
-            printf("iteration : %p\n", spt_e->user_vaddr);
+            // printf("iteration : %p\n", spt_e->user_vaddr);
             if(spt_e->user_vaddr == aligned_addr) return spt_e;
         }
     }
@@ -180,7 +180,7 @@ grow_stack(void* addr){
         return false;
     }
     success = page_insert(spt_e);
-    printf("inserted : %p\n", spt_e->user_vaddr);
+    // printf("inserted : %p\n", spt_e->user_vaddr);
     return success;
 }
 
@@ -202,7 +202,7 @@ setup_stack_grow(void* addr){
     spt_e->accessed = true;
     bool success = page_insert(spt_e); // can insert at front kys
     ASSERT(success);
-    printf("inserted : %p\n", spt_e->user_vaddr);
+    // printf("inserted : %p\n", spt_e->user_vaddr);
 
     success = install_page(addr, frame_addr, spt_e->writable);
 
