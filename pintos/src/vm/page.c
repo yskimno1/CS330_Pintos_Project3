@@ -112,7 +112,9 @@ free_page(struct list_elem* e){
 bool
 page_handling(struct sup_page_table_entry* spt_e){
     // return swap_handling(spt_e);
+    lock_acquire(&lock_frame);
     return file_handling(spt_e);
+    lock_release(&lock_frame);
 }
 
 bool
@@ -120,6 +122,7 @@ file_handling(struct sup_page_table_entry* spt_e){
 
     void* frame;
     filelock_acquire();
+    printf("1\n");
     if(spt_e->read_bytes == 0) frame = allocate_frame(spt_e, PAL_USER|PAL_ZERO);
     else frame = allocate_frame(spt_e, PAL_USER);
     ASSERT(frame);
