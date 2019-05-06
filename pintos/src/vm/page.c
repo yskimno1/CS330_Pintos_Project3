@@ -63,6 +63,7 @@ allocate_page (void* addr, bool access, enum palloc_type p_type, uint32_t read_b
     if(p_type == GROW_STACK || p_type == PAGE_FAULT){
         spt_e->user_vaddr = addr;
         spt_e->accessed = access;
+        spt_e->writable = writable;
     }
     else if(p_type == LOAD_SEGMENT){
         spt_e->user_vaddr = addr;
