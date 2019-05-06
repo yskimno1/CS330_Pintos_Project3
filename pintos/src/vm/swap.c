@@ -40,7 +40,12 @@ swap_init (void)
 bool 
 swap_in (void *addr)
 { 
+    lock_acquire(&swap_lock);
 
+    
+    
+
+    lock_release(&swap_lock);
     return false;
 }
 

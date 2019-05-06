@@ -521,7 +521,7 @@ load_segment (struct file *file, off_t ofs, uint8_t *upage,
         memset (frame + spt_e->read_bytes, 0, spt_e->zero_bytes);
       }
 
-      spt_e->accessed = true;     
+      spt_e->loaded = true;     
       // struct sup_page_table_entry* spt_e;
       // spt_e = allocate_page(upage, false, LOAD_SEGMENT, page_read_bytes, page_zero_bytes, file, ofs, writable);
       // if(spt_e == NULL){
