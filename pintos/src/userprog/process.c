@@ -307,7 +307,7 @@ load (const char *file_name, void (**eip) (void), void **esp)
     argc++;
     arg = strtok_r(NULL, " ", &saveptr);
   }
-
+  filelock_acquire();
   /* Open executable file. */
   file = filesys_open (argv[0]);
   if (file == NULL) 
@@ -397,11 +397,12 @@ load (const char *file_name, void (**eip) (void), void **esp)
   *eip = (void (*) (void)) ehdr.e_entry;
 
   success = true;
-
+  file_deny_write(file);
  done:
   /* We arrive here whether the load is successful or not. */
   file_close (file);
   free(filename_args);
+  filelock_release();
   return success;
 }
 
@@ -528,7 +529,7 @@ load_segment (struct file *file, off_t ofs, uint8_t *upage,
       /* Advance. */
       read_bytes -= page_read_bytes;
       zero_bytes -= page_zero_bytes;
-      ofs += page_read_bytes;
+      ofs += PGSIZE;
       upage += PGSIZE;
     }
   return true;
