@@ -481,9 +481,9 @@ load_segment (struct file *file, off_t ofs, uint8_t *upage,
       /* Do calculate how to fill this page.
          We will read PAGE_READ_BYTES bytes from FILE
          and zero the final PAGE_ZERO_BYTES bytes. */
-      // size_t page_read_bytes = read_bytes < PGSIZE ? read_bytes : PGSIZE;
-      // size_t page_zero_bytes = PGSIZE - page_read_bytes;
-      // /* Get a page of memory. */
+      size_t page_read_bytes = read_bytes < PGSIZE ? read_bytes : PGSIZE;
+      size_t page_zero_bytes = PGSIZE - page_read_bytes;
+      /* Get a page of memory. */
 
       // struct sup_page_table_entry* spt_e;
       // lock_acquire(&lock_frame);
@@ -499,14 +499,14 @@ load_segment (struct file *file, off_t ofs, uint8_t *upage,
       //   return false;
       // }
       // lock_release(&lock_frame);
-    
+/*    
       bool success;
       success = add_page(upage, false, LOAD_SEGMENT, page_read_bytes, page_zero_bytes, file, ofs, writable);
       if(success == false){
         printf("success false\n" );
         return false;
       }
-
+*/
       uint8_t* kpage = palloc_get_page (PAL_USER);
       if (kpage == NULL)
         return false;
