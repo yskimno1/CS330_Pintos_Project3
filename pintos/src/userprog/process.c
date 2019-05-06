@@ -500,7 +500,6 @@ load_segment (struct file *file, off_t ofs, uint8_t *upage,
       // }
       // lock_release(&lock_frame);
       lock_acquire(&lock_frame);
-      printf("2\n");
       uint8_t* kpage = palloc_get_page (PAL_USER);
       if (kpage == NULL){
         lock_release(&lock_frame);
