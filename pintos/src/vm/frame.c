@@ -34,7 +34,7 @@ create_frame_table_entry(void* frame, struct frame_table_entry* spt_e){
     fte->owner = thread_current();
     /* spte should be initialized! */
     fte->spte = spt_e;
-    printf("spte info : %p %d %d\n", fte->spte->user_vaddr, fte->spte->read_bytes, fte->spte->writable);
+    // printf("spte info : %p %d %d\n", fte->spte->user_vaddr, fte->spte->read_bytes, fte->spte->writable);
     return fte;
 }
 

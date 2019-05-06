@@ -76,7 +76,7 @@ allocate_page (void* addr, bool access, enum palloc_type p_type, uint32_t read_b
         spt_e->offset = offset;
         spt_e->file = file;
         spt_e->writable = writable;
-        printf("read bytes : %d, offset %d, address %p, file %p\n", spt_e->read_bytes, spt_e->offset, spt_e->user_vaddr, file);
+        // printf("read bytes : %d, offset %d, address %p, file %p\n", spt_e->read_bytes, spt_e->offset, spt_e->user_vaddr, file);
     }
     else ASSERT(0);
 
@@ -140,9 +140,9 @@ file_handling(struct sup_page_table_entry* spt_e){
 
     if(spt_e->read_bytes > 0){
         off_t temp = file_read_at (spt_e->file, frame, spt_e->read_bytes, spt_e->offset);
-        printf("temp : %d\n", temp);
+        // printf("temp : %d\n", temp);
         if (temp != (int) spt_e->read_bytes){
-            printf("%d vs %d\n", temp, (int) spt_e->read_bytes);
+            // printf("%d vs %d\n", temp, (int) spt_e->read_bytes);
             free_frame(frame);
             filelock_release();
             ASSERT(0);
@@ -189,7 +189,7 @@ grow_stack(void* addr){
 
 bool
 setup_stack_grow(void* addr){
-    printf("setup stack grow start!\n");
+
     struct sup_page_table_entry* spt_e = allocate_page(addr, false, GROW_STACK, 0, 0, NULL, 0, 1);
     if(spt_e==NULL){
         printf("spte null\n");
@@ -207,7 +207,7 @@ setup_stack_grow(void* addr){
     ASSERT(success);
 
     success = install_page(addr, frame_addr, spt_e->writable);
-    printf("Setup stack grow done!\n");
+
     if(success == false){
         printf("install page failed\n");
         free_frame(frame_addr);
