@@ -158,17 +158,13 @@ page_fault (struct intr_frame *f)
    // printf("before %p, round down : %p, PHYS_BASE : %p, temp : %p, limit %d\n", fault_addr, pg_round_down(fault_addr), PHYS_BASE, temp, LIMIT);
       
    if(is_user_vaddr(fault_addr) && not_present){
-      printf("6\n");
-      lock_acquire(&lock_frame);
-      printf("5\n");
       // printf("list size : %d\n", list_size(&thread_current()->sup_page_table));
       struct sup_page_table_entry* spt_e = find_page(fault_addr);
       if(spt_e != NULL){ /* there exists a page */
          // printf("spt_e : addr %p, offset %d, read bytes %d\n", spt_e->user_vaddr, spt_e->offset, spt_e->read_bytes);
-         
+
          success = page_handling(spt_e);
          if(success){
-            lock_release(&lock_frame);
             return;
          }
          else{
@@ -177,19 +173,20 @@ page_fault (struct intr_frame *f)
             not_present ? "not present" : "rights violation",
             write ? "writing" : "reading",
             user ? "user" : "kernel");
-            lock_release(&lock_frame);
             kill (f);         
          }
       }
 
       if((size_t) (PHYS_BASE - pg_round_down(fault_addr)) > LIMIT){
-         lock_release(&lock_frame);
+
          // ASSERT(0);
          exit(-1);
       }
    //   printf(" fault : %p\n, esp %p, esp-32 : %p", fault_addr, f->esp, f->esp - SIZE);
       else if(fault_addr >= f->esp - SIZE){
+         lock_acquire(&lock_frame);
          success = grow_stack(fault_addr);
+         lock_release(&lock_frame);
          // printf("%d\n", success);
          if(success) return;
          else{
@@ -198,7 +195,6 @@ page_fault (struct intr_frame *f)
             not_present ? "not present" : "rights violation",
             write ? "writing" : "reading",
             user ? "user" : "kernel");
-            lock_release(&lock_frame);
             kill (f);
          }
       }
