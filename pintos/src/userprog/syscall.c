@@ -183,9 +183,11 @@ uint32_t*
 p_argv(void* addr){
 	// printf("addr : %p\n", addr);
   if (addr==NULL){
+		printf("there\n");
     exit(-1);
 	}
   if (!is_user_vaddr(addr) || addr < STACK_BOTTOM){
+		printf("here\n");
     exit(-1);
 	}
 	if(is_bad_pointer(addr)){
@@ -277,7 +279,6 @@ int filesize (int fd){
 }
 
 int read (int fd, void *buffer, unsigned size){
-	printf("read came\n");
 	filelock_acquire();
 	int cnt=-1; unsigned i;
 	char* buffer_pointer = buffer;
@@ -405,6 +406,9 @@ string_validate(const char* ptr){
 bool
 is_bad_pointer(const char* ptr){
 	void* ptr_page = pagedir_get_page(thread_current()->pagedir, ptr);
-	if(!ptr_page) return true;
+	if(!ptr_page){
+		printf("bad pointer\n");
+		return true;
+	}
 	else return false;
 }
