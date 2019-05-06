@@ -485,6 +485,7 @@ load_segment (struct file *file, off_t ofs, uint8_t *upage,
       /* Get a page of memory. */
 
       struct sup_page_table_entry* spt_e;
+
       spt_e = allocate_page(upage, false, LOAD_SEGMENT, page_read_bytes, page_zero_bytes, file, ofs, writable);
       if(spt_e == NULL) return false;
 
@@ -541,7 +542,6 @@ setup_stack (void **esp, int argc, void** argv)
   success = setup_stack_grow(((uint8_t* )PHYS_BASE) - PGSIZE);
   if(success){
     *esp = PHYS_BASE;
-    printf("esp : %p\n", *esp);
     /* Implementation start */
     /* copy the pointer of argv */
     
