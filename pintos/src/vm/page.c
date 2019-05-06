@@ -124,7 +124,6 @@ file_handling(struct sup_page_table_entry* spt_e){
     if(frame == NULL) return false;
 
     filelock_acquire();
-    printf("writable : %d\n", spt_e->writable);
     bool success = install_page(spt_e->user_vaddr, frame, spt_e->writable);
     ASSERT(success);
     if(success == false){
