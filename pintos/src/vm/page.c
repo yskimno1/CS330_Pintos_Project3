@@ -130,7 +130,6 @@ file_handling(struct sup_page_table_entry* spt_e){
         return false;
     }
 
-
     bool success = install_page(spt_e->user_vaddr, frame, spt_e->writable);
     ASSERT(success);
     if(success == false){
