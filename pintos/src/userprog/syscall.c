@@ -294,9 +294,21 @@ int read (int fd, void *buffer, unsigned size, void* esp){
 	void* ptr = buffer;
 	for(;ptr<buffer+size; ptr++){
 		if (is_bad_pointer(ptr)){
-			filelock_release();
-			exit(-1);
-			return -1;
+
+			struct sup_page_table_entry* spt_e = find_page(ptr);
+			if(spt_e != NULL){
+				printf("need to load page in syscall.read!\n");
+				ASSERT(0);
+			}
+			if(ptr >= esp - 32){
+				printf("grow stack at pointer %p!\n", ptr);
+				bool success = grow_stack(ptr);
+				if(success == false){
+
+					filelock_release();
+					exit(-1);
+				}
+			}
 		}
 	}
 
@@ -333,11 +345,16 @@ int write (int fd, const void *buffer, unsigned size){
 		exit(-1);
     return cnt;
 	}
-	if (is_bad_pointer(buffer+size)){
-		filelock_release();
-		exit(-1);
-		return -1;
+	void* ptr = buffer;
+	for(;ptr<buffer+size; ptr++){
+		if (is_bad_pointer(ptr)){
+			filelock_release();
+			exit(-1);
+			return -1;
+		}
 	}
+
+
 	if (fd ==0){
 		filelock_release();
 		exit(-1);
