@@ -182,7 +182,7 @@ page_fault (struct intr_frame *f)
 
       if((size_t) (PHYS_BASE - pg_round_down(fault_addr)) > LIMIT){
          lock_release(&lock_frame);
-         ASSERT(0);
+         // ASSERT(0);
          exit(-1);
       }
    //   printf(" fault : %p\n, esp %p, esp-32 : %p", fault_addr, f->esp, f->esp - SIZE);
