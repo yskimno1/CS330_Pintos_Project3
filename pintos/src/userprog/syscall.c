@@ -13,6 +13,7 @@
 #include "devices/input.h"
 #include "userprog/process.h"
 #include "filesys/off_t.h"
+#include "vm/page.h"
 // struct file 
 //   {
 //     struct inode *inode;        /* File's inode. */
@@ -30,7 +31,7 @@ static int create (const char *file, unsigned initial_size);
 static int remove (const char *file);
 static int open (const char *file);
 static int filesize (int fd);
-static int read (int fd, void *buffer, unsigned size);
+static int read (int fd, void *buffer, unsigned size, void* esp);
 static int write (int fd, const void *buffer, unsigned size);
 static void seek (int fd, unsigned position);
 static int tell (int fd);
@@ -134,7 +135,7 @@ syscall_handler (struct intr_frame *f)
   		argv0 = *p_argv(if_esp+4);
       argv1 = *p_argv(if_esp+8);
       argv2 = *p_argv(if_esp+12);
-			f->eax = read((int)argv0, (void *)argv1, (unsigned)argv2);
+			f->eax = read((int)argv0, (void *)argv1, (unsigned)argv2, if_esp);
   		break;
 
   	case SYS_WRITE:		/* Write to a file. */
@@ -191,6 +192,7 @@ p_argv(void* addr){
 	if(is_bad_pointer(addr)){
 		exit(-1);
 	}
+
   return (uint32_t *)(addr);
 }
 
@@ -276,7 +278,7 @@ int filesize (int fd){
 	return file_length(thread_current()->fdt[fd]);
 }
 
-int read (int fd, void *buffer, unsigned size){
+int read (int fd, void *buffer, unsigned size, void* esp){
 	filelock_acquire();
 	int cnt=-1; unsigned i;
 	char* buffer_pointer = buffer;
@@ -288,6 +290,13 @@ int read (int fd, void *buffer, unsigned size){
 		filelock_release();
 		exit(-1);
     return -1;
+	}
+	void* i = buffer;
+	for(;i<buffer+size; i++){
+		if(i >= esp - 32){
+			bool success = grow_stack(i);
+			if(success == false) exit(-1);
+		}
 	}
 	// if (is_bad_pointer(buffer+size)){
 	// 	filelock_release();
