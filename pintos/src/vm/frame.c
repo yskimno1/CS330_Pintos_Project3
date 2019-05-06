@@ -34,7 +34,7 @@ create_frame_table_entry(void* frame, struct frame_table_entry* spt_e){
     fte->owner = thread_current();
     /* spte should be initialized! */
     fte->spte = spt_e;
-
+    printf("spte info : %p %d %d\n", fte->spte->user_vaddr, fte->spte->read_bytes, fte->spte->writable);
     return fte;
 }
 
@@ -54,9 +54,9 @@ allocate_frame (struct sup_page_table_entry* spt_e, enum palloc_flags flag)
     ASSERT(fte != NULL);
     if(fte == NULL) return NULL;
 
-    // lock_acquire(&lock_frame);
+    lock_acquire(&lock_frame);
     insert_frame_table(fte);
-    // lock_release(&lock_frame);
+    lock_release(&lock_frame);
     ASSERT(frame!=NULL);
 
     return frame;
@@ -77,7 +77,7 @@ search_frame_table_entry (void* frame){
 
 void*
 free_frame (void* frame){
-    // lock_acquire(&lock_frame);
+    lock_acquire(&lock_frame);
     struct list_elem* e;
     struct frame_table_entry* fte;
     if(!list_empty(&frame_table)){
@@ -92,5 +92,5 @@ free_frame (void* frame){
         }
     }
 
-    // lock_release(&lock_frame);
+    lock_release(&lock_frame);
 }
