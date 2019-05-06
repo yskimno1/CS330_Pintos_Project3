@@ -485,48 +485,50 @@ load_segment (struct file *file, off_t ofs, uint8_t *upage,
       size_t page_zero_bytes = PGSIZE - page_read_bytes;
       /* Get a page of memory. */
 
-      // struct sup_page_table_entry* spt_e;
-      // lock_acquire(&lock_frame);
-      // spt_e = allocate_page(upage, false, LOAD_SEGMENT, page_read_bytes, page_zero_bytes, file, ofs, writable);
-      // if(spt_e == NULL){
-      //   lock_release(&lock_frame);
-      //   return false;
-      // }
-
-      // bool success = page_insert(spt_e);
-      // if(success == false){
-      //   lock_release(&lock_frame);
-      //   return false;
-      // }
-      // lock_release(&lock_frame);
       lock_acquire(&lock_frame);
-      uint8_t* kpage = palloc_get_page (PAL_USER);
-      if (kpage == NULL){
+      struct sup_page_table_entry* spt_e;
+      lock_acquire(&lock_frame);
+      spt_e = allocate_page(upage, false, LOAD_SEGMENT, page_read_bytes, page_zero_bytes, file, ofs, writable);
+      if(spt_e == NULL){
         lock_release(&lock_frame);
         return false;
       }
 
-      /* Load this page. */
-      if (file_read (file, kpage, page_read_bytes) != (int) page_read_bytes)
-        {
-          palloc_free_page (kpage);
-          lock_release(&lock_frame);
-          return false; 
-        }
-      memset (kpage + page_read_bytes, 0, page_zero_bytes);
+      bool success = page_insert(spt_e);
+      if(success == false){
+        lock_release(&lock_frame);
+        return false;
+      }
+      // lock_release(&lock_frame);
 
-      /* Add the page to the process's address space. */
-      if (!install_page (upage, kpage, writable)) 
-        {
-          palloc_free_page (kpage);
-          lock_release(&lock_frame);
-          return false; 
-        }
+      // uint8_t* kpage = palloc_get_page (PAL_USER);
+      // if (kpage == NULL){
+      //   lock_release(&lock_frame);
+      //   return false;
+      // }
+
+      // /* Load this page. */
+      // if (file_read (file, kpage, page_read_bytes) != (int) page_read_bytes)
+      //   {
+      //     palloc_free_page (kpage);
+      //     lock_release(&lock_frame);
+      //     return false; 
+      //   }
+      // memset (kpage + page_read_bytes, 0, page_zero_bytes);
+
+      // /* Add the page to the process's address space. */
+      // if (!install_page (upage, kpage, writable)) 
+      //   {
+      //     palloc_free_page (kpage);
+      //     lock_release(&lock_frame);
+      //     return false; 
+      //   }
+
       lock_release(&lock_frame);
       /* Advance. */
       read_bytes -= page_read_bytes;
       zero_bytes -= page_zero_bytes;
-      // ofs += PGSIZE;
+      ofs += PGSIZE;
       upage += PGSIZE;
     }
   return true;
