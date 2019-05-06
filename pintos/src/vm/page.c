@@ -117,13 +117,13 @@ bool
 file_handling(struct sup_page_table_entry* spt_e){
 
     void* frame;
-
+    filelock_acquire();
     if(spt_e->read_bytes == 0) frame = allocate_frame(spt_e, PAL_USER|PAL_ZERO);
     else frame = allocate_frame(spt_e, PAL_USER);
     ASSERT(frame);
     if(frame == NULL) return false;
 
-    filelock_acquire();
+
     bool success = install_page(spt_e->user_vaddr, frame, spt_e->writable);
     ASSERT(success);
     if(success == false){
