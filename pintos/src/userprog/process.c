@@ -487,7 +487,6 @@ load_segment (struct file *file, off_t ofs, uint8_t *upage,
 
       lock_acquire(&lock_frame);
       struct sup_page_table_entry* spt_e;
-      lock_acquire(&lock_frame);
       spt_e = allocate_page(upage, false, LOAD_SEGMENT, page_read_bytes, page_zero_bytes, file, ofs, writable);
       if(spt_e == NULL){
         lock_release(&lock_frame);
