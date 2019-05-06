@@ -32,9 +32,11 @@ page_insert(struct sup_page_table_entry* spt_e){
     struct thread* curr = thread_current();
     struct list_elem* e;
     if(!list_empty(&curr->sup_page_table)){
+
         for(e=list_begin(&curr->sup_page_table); e!=list_end(&curr->sup_page_table); e = list_next(e)){
+            struct sup_page_table_entry* temp = list_entry(e, struct sup_page_table_entry, elem);
             if(e == &spt_e->elem){
-                ASSERT(0);
+                // ASSERT(0);
                 return false;
             }
         }
