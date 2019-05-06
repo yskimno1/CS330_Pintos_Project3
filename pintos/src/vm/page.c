@@ -123,7 +123,10 @@ file_handling(struct sup_page_table_entry* spt_e){
     if(spt_e->read_bytes == 0) frame = allocate_frame(spt_e, PAL_USER|PAL_ZERO);
     else frame = allocate_frame(spt_e, PAL_USER);
     ASSERT(frame);
-    if(frame == NULL) return false;
+    if(frame == NULL){
+        filelock_release();
+        return false;
+    }
 
 
     bool success = install_page(spt_e->user_vaddr, frame, spt_e->writable);

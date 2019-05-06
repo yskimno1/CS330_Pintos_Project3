@@ -499,22 +499,19 @@ load_segment (struct file *file, off_t ofs, uint8_t *upage,
       //   return false;
       // }
       // lock_release(&lock_frame);
-/*    
-      bool success;
-      success = add_page(upage, false, LOAD_SEGMENT, page_read_bytes, page_zero_bytes, file, ofs, writable);
-      if(success == false){
-        printf("success false\n" );
+      lock_acquire(&lock_frame);
+      printf("2\n");
+      uint8_t* kpage = palloc_get_page (PAL_USER);
+      if (kpage == NULL){
+        lock_release(&lock_frame);
         return false;
       }
-*/
-      uint8_t* kpage = palloc_get_page (PAL_USER);
-      if (kpage == NULL)
-        return false;
 
       /* Load this page. */
       if (file_read (file, kpage, page_read_bytes) != (int) page_read_bytes)
         {
           palloc_free_page (kpage);
+          lock_release(&lock_frame);
           return false; 
         }
       memset (kpage + page_read_bytes, 0, page_zero_bytes);
@@ -523,9 +520,10 @@ load_segment (struct file *file, off_t ofs, uint8_t *upage,
       if (!install_page (upage, kpage, writable)) 
         {
           palloc_free_page (kpage);
+          lock_release(&lock_frame);
           return false; 
         }
-
+      lock_release(&lock_frame);
       /* Advance. */
       read_bytes -= page_read_bytes;
       zero_bytes -= page_zero_bytes;
