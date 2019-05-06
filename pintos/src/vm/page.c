@@ -28,6 +28,7 @@ list_less(const struct list_elem* a, const struct list_elem* b, void* aux){
 
 bool
 page_insert(struct sup_page_table_entry* spt_e){
+    lock_acquire(&thread_current()->page_lock);
     struct thread* curr = thread_current();
     struct list_elem* e;
     if(!list_empty(&curr->sup_page_table)){
@@ -39,6 +40,7 @@ page_insert(struct sup_page_table_entry* spt_e){
         }
     }
     list_push_back(&curr->sup_page_table, &spt_e->elem);
+    lock_release(&thread_current()->page_lock);
     return true;
     //list_insert_ordered(&curr->sup_page_table, &spt_e->elem, list_less, 0);
 }
@@ -58,6 +60,7 @@ add_page(void* addr, bool access, enum palloc_type p_type, uint32_t read_bytes, 
  */
 struct sup_page_table_entry* 
 allocate_page (void* addr, bool access, enum palloc_type p_type, uint32_t read_bytes, uint32_t zero_bytes, struct file* file, int32_t offset, bool writable){
+    lock_acquire(&thread_current()->page_lock);
     struct sup_page_table_entry* spt_e = malloc(sizeof(struct sup_page_table_entry));
     if(spt_e == NULL) return NULL;
     if(p_type == GROW_STACK || p_type == PAGE_FAULT){
@@ -76,11 +79,13 @@ allocate_page (void* addr, bool access, enum palloc_type p_type, uint32_t read_b
         printf("read bytes : %d, offset %d, address %p, file %p\n", spt_e->read_bytes, spt_e->offset, spt_e->user_vaddr, file);
     }
     else ASSERT(0);
+    lock_release(&thread_current()->page_lock);
     return spt_e;
 }
 
 struct sup_page_table_entry*
 find_page(void* addr){
+    lock_acquire(&thread_current()->page_lock);
     void* aligned_addr = pg_round_down(addr);
     struct sup_page_table_entry* spt_e;
 
@@ -93,6 +98,7 @@ find_page(void* addr){
             if(spt_e->user_vaddr == aligned_addr) return spt_e;
         }
     }
+    lock_release(&thread_current()->page_lock);
     return NULL;
 }
 
