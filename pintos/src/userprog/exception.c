@@ -7,6 +7,8 @@
 #include "userprog/syscall.h"
 #include "threads/vaddr.h"
 
+#include "vm/frame.h"
+
 /* Number of page faults processed. */
 static long long page_fault_cnt;
 
@@ -156,22 +158,29 @@ page_fault (struct intr_frame *f)
    printf("before %p, round down : %p, PHYS_BASE : %p, temp : %p, limit %d\n", fault_addr, pg_round_down(fault_addr), PHYS_BASE, temp, LIMIT);
       
    if(is_user_vaddr(fault_addr) && not_present){
+      lock_acquire(&lock_frame);
       struct sup_page_table_entry* spt_e = find_page(fault_addr);
       if(spt_e != NULL){ /* there exists a page */
          printf("spt_e : addr %p, offset %d, read bytes %d\n", spt_e->user_vaddr, spt_e->offset, spt_e->read_bytes);
+         
          success = page_handling(spt_e);
-         if(success) return;
+         if(success){
+            lock_release(&lock_frame);
+            return;
+         }
          else{
             printf ("Page fault at %p: %s error %s page in %s context.\n",
             fault_addr,
             not_present ? "not present" : "rights violation",
             write ? "writing" : "reading",
             user ? "user" : "kernel");
+            lock_release(&lock_frame);
             kill (f);         
          }
       }
 
       if((size_t) (PHYS_BASE - pg_round_down(fault_addr)) > LIMIT){
+         lock_release(&lock_frame);
          ASSERT(0);
          exit(-1);
       }
@@ -186,10 +195,14 @@ page_fault (struct intr_frame *f)
             not_present ? "not present" : "rights violation",
             write ? "writing" : "reading",
             user ? "user" : "kernel");
+            lock_release(&lock_frame);
             kill (f);
          }
       }
-      else exit(-1);
+      else{
+         lock_release(&lock_frame);
+         exit(-1);
+      }
       return;
    }
 
