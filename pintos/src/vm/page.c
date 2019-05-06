@@ -32,7 +32,10 @@ page_insert(struct sup_page_table_entry* spt_e){
     struct list_elem* e;
     if(!list_empty(&curr->sup_page_table)){
         for(e=list_begin(&curr->sup_page_table); e!=list_end(&curr->sup_page_table); e = list_next(e)){
-            if(e == &spt_e->elem) return false;
+            if(e == &spt_e->elem){
+                ASSERT(0);
+                return false;
+            }
         }
     }
     printf("page insert start\n");
