@@ -263,7 +263,6 @@ int open (const char *file){
   t->fdt[fd] = f;
 
   if (!strcmp(t->name, file)){
-			ASSERT(0);
       file_deny_write(f);
 	}
 

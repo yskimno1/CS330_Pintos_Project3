@@ -522,69 +522,129 @@ load_segment (struct file *file, off_t ofs, uint8_t *upage,
     }
   return true;
 }
-
-/* Create a minimal stack by mapping a zeroed page at the top of
-   user virtual memory. */
 static bool
 setup_stack (void **esp, int argc, void** argv) 
 {
   uint8_t *kpage;
   bool success = false;
 
+  kpage = palloc_get_page (PAL_USER | PAL_ZERO);
+  if (kpage != NULL) 
+    {
+      success = install_page (((uint8_t *) PHYS_BASE) - PGSIZE, kpage, true);
+      if(success){
+        *esp = PHYS_BASE;
+        /* Implementation start */
+        /* copy the pointer of argv */
+        
+        char* pargv[argc];
+        int i;
+        for(i=argc-1; i>=0; i--){
+          size_t argv_len = strlen(argv[i]);
+          *esp = *esp - (argv_len+1);
+          memcpy(*esp, argv[i], argv_len+1);
+          pargv[i] = *esp;
+        }
+        
+        /* word-align value */
+        while((int) *esp%4 != 0){
+          *esp = *esp - sizeof(uint8_t);
+          uint8_t temp = 0;
+          memcpy(*esp, &temp , sizeof(uint8_t));
+        }
+
+        /* argv */
+        char* zero = 0;
+        *esp = *esp - sizeof(char* );
+        memcpy(*esp, &zero, sizeof(char* ));
+        for(i=argc-1; i>=0; i--){ /* one more push */
+          *esp = *esp - (sizeof(char* ));
+          memcpy(*esp, &pargv[i], sizeof(char* ));
+        }
+        
+        char** p_argv = *esp;
+        *esp = *esp - sizeof(char** );
+        memcpy(*esp, &p_argv, sizeof(char **));
+
+        *esp = *esp - sizeof(int);
+        memcpy(*esp, &argc, sizeof(int));
+
+        void* return_addr = 0;
+        *esp = *esp - sizeof(void* );
+        memcpy(*esp, &return_addr, sizeof(void*));
+
+        // hex_dump(*esp-4, *esp-4, 100, 1);
+      }
+      else
+        palloc_free_page (kpage);
+    }
+  return success;
+}
+
+
+
+/* Create a minimal stack by mapping a zeroed page at the top of
+   user virtual memory. */
+// static bool
+// setup_stack (void **esp, int argc, void** argv) 
+// {
+//   uint8_t *kpage;
+//   bool success = false;
+
   // success = setup_stack_grow(((uint8_t *) PHYS_BASE) - PGSIZE);
 
-  success = setup_stack_grow(((uint8_t* )PHYS_BASE) - PGSIZE);
-  if(success){
-    *esp = PHYS_BASE;
-    printf("esp : %p\n", *esp);
-    /* Implementation start */
-    /* copy the pointer of argv */
+//   success = setup_stack_grow(((uint8_t* )PHYS_BASE) - PGSIZE);
+//   if(success){
+//     *esp = PHYS_BASE;
+//     printf("esp : %p\n", *esp);
+//     /* Implementation start */
+//     /* copy the pointer of argv */
     
-    char* pargv[argc];
-    int i;
-    for(i=argc-1; i>=0; i--){
-      size_t argv_len = strlen(argv[i]);
-      *esp = *esp - (argv_len+1);
-      memcpy(*esp, argv[i], argv_len+1);
-      pargv[i] = *esp;
-    }
+//     char* pargv[argc];
+//     int i;
+//     for(i=argc-1; i>=0; i--){
+//       size_t argv_len = strlen(argv[i]);
+//       *esp = *esp - (argv_len+1);
+//       memcpy(*esp, argv[i], argv_len+1);
+//       pargv[i] = *esp;
+//     }
     
-    /* word-align value */
-    while((int) *esp%4 != 0){
-      *esp = *esp - sizeof(uint8_t);
-      uint8_t temp = 0;
-      memcpy(*esp, &temp , sizeof(uint8_t));
-    }
+//     /* word-align value */
+//     while((int) *esp%4 != 0){
+//       *esp = *esp - sizeof(uint8_t);
+//       uint8_t temp = 0;
+//       memcpy(*esp, &temp , sizeof(uint8_t));
+//     }
 
-    /* argv */
-    char* zero = 0;
-    *esp = *esp - sizeof(char* );
-    memcpy(*esp, &zero, sizeof(char* ));
-    for(i=argc-1; i>=0; i--){ /* one more push */
-      *esp = *esp - (sizeof(char* ));
-      memcpy(*esp, &pargv[i], sizeof(char* ));
-    }
+//     /* argv */
+//     char* zero = 0;
+//     *esp = *esp - sizeof(char* );
+//     memcpy(*esp, &zero, sizeof(char* ));
+//     for(i=argc-1; i>=0; i--){ /* one more push */
+//       *esp = *esp - (sizeof(char* ));
+//       memcpy(*esp, &pargv[i], sizeof(char* ));
+//     }
     
-    char** p_argv = *esp;
-    *esp = *esp - sizeof(char** );
-    memcpy(*esp, &p_argv, sizeof(char **));
+//     char** p_argv = *esp;
+//     *esp = *esp - sizeof(char** );
+//     memcpy(*esp, &p_argv, sizeof(char **));
 
-    *esp = *esp - sizeof(int);
-    memcpy(*esp, &argc, sizeof(int));
+//     *esp = *esp - sizeof(int);
+//     memcpy(*esp, &argc, sizeof(int));
 
-    void* return_addr = 0;
-    *esp = *esp - sizeof(void* );
-    memcpy(*esp, &return_addr, sizeof(void*));
+//     void* return_addr = 0;
+//     *esp = *esp - sizeof(void* );
+//     memcpy(*esp, &return_addr, sizeof(void*));
 
-    printf("stack done\n");
-    // hex_dump(*esp-4, *esp-4, 100, 1);
-  }
-  else{
-    printf("grow stack failed\n");
-  }
-  return success;
+//     printf("stack done\n");
+//     // hex_dump(*esp-4, *esp-4, 100, 1);
+//   }
+//   else{
+//     printf("grow stack failed\n");
+//   }
+//   return success;
   
-}
+// }
 
 /* Adds a mapping from user virtual address UPAGE to kernel
    virtual address KPAGE to the page table.
