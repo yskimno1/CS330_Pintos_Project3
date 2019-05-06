@@ -47,15 +47,6 @@ page_insert(struct sup_page_table_entry* spt_e){
     //list_insert_ordered(&curr->sup_page_table, &spt_e->elem, list_less, 0);
 }
 
-bool
-add_page(void* addr, bool access, enum palloc_type p_type, uint32_t read_bytes, uint32_t zero_bytes, struct file *file, int32_t offset, bool writable){
-    struct sup_page_table_entry* spt_e;
-    spt_e = allocate_page(addr, access, p_type, read_bytes, zero_bytes, file, offset, writable);
-    if(spt_e == NULL) return false;
-
-    bool success = page_insert(spt_e);
-    return success;
-}
 
 /*
  * Make new supplementary page table entry for addr 
@@ -187,6 +178,7 @@ grow_stack(void* addr){
         return false;
     }
     success = page_insert(spt_e);
+    printf("inserted : %p\n", spt_e->user_vaddr);
     return success;
 }
 
@@ -208,6 +200,7 @@ setup_stack_grow(void* addr){
     spt_e->accessed = true;
     bool success = page_insert(spt_e); // can insert at front kys
     ASSERT(success);
+    printf("inserted : %p\n", spt_e->user_vaddr);
 
     success = install_page(addr, frame_addr, spt_e->writable);
 
