@@ -134,8 +134,8 @@ file_handling(struct sup_page_table_entry* spt_e){
     }
 
     if(spt_e->read_bytes > 0){
-        file_seek (spt_e->file, spt_e->offset);
-        off_t temp = file_read (spt_e->file, frame, spt_e->read_bytes);
+        // file_seek (spt_e->file, spt_e->offset);
+        off_t temp = file_read_at (spt_e->file, frame, spt_e->read_bytes, spt_e->offset);
         printf("temp : %d\n", temp);
         if (temp != (int) spt_e->read_bytes){
             printf("%d vs %d\n", temp, (int) spt_e->read_bytes);
@@ -205,7 +205,7 @@ setup_stack_grow(void* addr){
     bool success = page_insert(spt_e); // can insert at front kys
     ASSERT(success);
 
-    success = install_page(addr, frame_addr, true);
+    success = install_page(addr, frame_addr, spt_e->writable);
     printf("Setup stack grow done!\n");
     if(success == false){
         printf("install page failed\n");
