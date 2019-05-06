@@ -85,10 +85,10 @@ find_page(void* addr){
     printf("aligned : %p\n", aligned_addr);
     struct list_elem* e;
     struct thread* curr = thread_current();
-    struct list sup_page_table = curr->sup_page_table;
+
     printf("finding page address %p\n", &curr->sup_page_table);
-    if(!list_empty(&sup_page_table)){
-        for(e=list_begin(&sup_page_table); e!=list_end(&sup_page_table); e = list_next(e)){
+    if(!list_empty(&curr->sup_page_table)){
+        for(e=list_begin(&curr->sup_page_table); e!=list_end(&curr->sup_page_table); e = list_next(e)){
             spt_e = list_entry(e, struct sup_page_table_entry, elem);
             printf("iteration : %p\n", spt_e->user_vaddr);
             if(spt_e->user_vaddr == aligned_addr) return spt_e;
