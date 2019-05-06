@@ -159,10 +159,10 @@ page_fault (struct intr_frame *f)
       
    if(is_user_vaddr(fault_addr) && not_present){
       lock_acquire(&lock_frame);
-      printf("list size : %d\n", list_size(&thread_current()->sup_page_table));
+      // printf("list size : %d\n", list_size(&thread_current()->sup_page_table));
       struct sup_page_table_entry* spt_e = find_page(fault_addr);
       if(spt_e != NULL){ /* there exists a page */
-         printf("spt_e : addr %p, offset %d, read bytes %d\n", spt_e->user_vaddr, spt_e->offset, spt_e->read_bytes);
+         // printf("spt_e : addr %p, offset %d, read bytes %d\n", spt_e->user_vaddr, spt_e->offset, spt_e->read_bytes);
          
          success = page_handling(spt_e);
          if(success){
@@ -188,7 +188,7 @@ page_fault (struct intr_frame *f)
    //   printf(" fault : %p\n, esp %p, esp-32 : %p", fault_addr, f->esp, f->esp - SIZE);
       else if(fault_addr >= f->esp - SIZE){
          success = grow_stack(fault_addr);
-         printf("%d\n", success);
+         // printf("%d\n", success);
          if(success) return;
          else{
             printf ("Page fault at %p: %s error %s page in %s context.\n",
