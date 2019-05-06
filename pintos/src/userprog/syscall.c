@@ -291,10 +291,10 @@ int read (int fd, void *buffer, unsigned size, void* esp){
 		exit(-1);
     return -1;
 	}
-	void* i = buffer;
-	for(;i<buffer+size; i++){
-		if(i >= esp - 32){
-			bool success = grow_stack(i);
+	void* ptr = buffer;
+	for(;ptr<buffer+size; i++){
+		if(ptr >= esp - 32){
+			bool success = grow_stack(ptr);
 			if(success == false) exit(-1);
 		}
 	}
