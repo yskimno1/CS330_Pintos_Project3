@@ -118,10 +118,10 @@ main (void)
   /* Initialize file system. */
   disk_init ();
   filesys_init (format_filesys);
-
+  swap_init ();
+  
 
 #endif
-  // swap_init ();
   printf ("Boot complete.\n");
   
   /* Run actions specified on kernel command line. */
