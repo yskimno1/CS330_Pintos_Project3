@@ -124,7 +124,7 @@ file_handling(struct sup_page_table_entry* spt_e){
     if(frame == NULL) return false;
 
     filelock_acquire();
-    
+    printf("writable : %d\n", spt_e->writable);
     bool success = install_page(spt_e->user_vaddr, frame, spt_e->writable);
     ASSERT(success);
     if(success == false){
@@ -134,7 +134,6 @@ file_handling(struct sup_page_table_entry* spt_e){
     }
 
     if(spt_e->read_bytes > 0){
-        // file_seek (spt_e->file, spt_e->offset);
         off_t temp = file_read_at (spt_e->file, frame, spt_e->read_bytes, spt_e->offset);
         printf("temp : %d\n", temp);
         if (temp != (int) spt_e->read_bytes){
