@@ -38,7 +38,6 @@ page_insert(struct sup_page_table_entry* spt_e){
             }
         }
     }
-    printf("page insert start\n");
     list_push_back(&curr->sup_page_table, &spt_e->elem);
     return true;
     //list_insert_ordered(&curr->sup_page_table, &spt_e->elem, list_less, 0);
@@ -189,7 +188,7 @@ grow_stack(void* addr){
 bool
 setup_stack_grow(void* addr){
     printf("setup stack grow start!\n");
-    struct sup_page_table_entry* spt_e = allocate_page(addr, false, GROW_STACK, 0, 0, NULL, 0, 0);
+    struct sup_page_table_entry* spt_e = allocate_page(addr, false, GROW_STACK, 0, 0, NULL, 0, 1);
     if(spt_e==NULL){
         printf("spte null\n");
         return false;
