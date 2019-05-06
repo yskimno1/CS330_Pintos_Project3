@@ -277,6 +277,7 @@ int filesize (int fd){
 }
 
 int read (int fd, void *buffer, unsigned size){
+	printf("read came\n");
 	filelock_acquire();
 	int cnt=-1; unsigned i;
 	char* buffer_pointer = buffer;
