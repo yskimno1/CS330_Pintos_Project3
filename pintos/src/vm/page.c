@@ -53,18 +53,18 @@ page_insert(struct sup_page_table_entry* spt_e){
  * Make new supplementary page table entry for addr 
  */
 struct sup_page_table_entry* 
-allocate_page (void* addr, bool access, enum palloc_type p_type, uint32_t read_bytes, uint32_t zero_bytes, struct file* file, int32_t offset, bool writable){
+allocate_page (void* addr, bool loaded, enum palloc_type p_type, uint32_t read_bytes, uint32_t zero_bytes, struct file* file, int32_t offset, bool writable){
 
     struct sup_page_table_entry* spt_e = malloc(sizeof(struct sup_page_table_entry));
     if(spt_e == NULL) return NULL;
     if(p_type == GROW_STACK || p_type == PAGE_FAULT){
         spt_e->user_vaddr = addr;
-        spt_e->accessed = access;
+        spt_e->loaded = loaded;
         spt_e->writable = writable;
     }
     else if(p_type == LOAD_SEGMENT){
         spt_e->user_vaddr = addr;
-        spt_e->accessed = access;
+        spt_e->loaded = loaded;
         spt_e->read_bytes = read_bytes;
         spt_e->zero_bytes = zero_bytes;
         spt_e->offset = offset;
@@ -101,7 +101,7 @@ find_page(void* addr){
 void*
 free_page(struct list_elem* e){
     struct sup_page_table_entry* spt_e = list_entry(e, struct sup_page_table_entry, elem);
-    if(spt_e->accessed){
+    if(spt_e->loaded){
         struct thread* curr = thread_current();
         free_frame(pagedir_get_page(curr->pagedir, spt_e->user_vaddr));
         pagedir_clear_page(curr->pagedir, spt_e->user_vaddr);
@@ -152,7 +152,7 @@ file_handling(struct sup_page_table_entry* spt_e){
         memset (frame + spt_e->read_bytes, 0, spt_e->zero_bytes);
     }
 
-    spt_e->accessed = true;
+    spt_e->loaded = true;
 
     return true;
 }
@@ -203,7 +203,7 @@ setup_stack_grow(void* addr){
         free(spt_e);
         return false;
     }
-    spt_e->accessed = true;
+    spt_e->loaded = true;
     bool success = page_insert(spt_e); // can insert at front kys
     ASSERT(success);
     // printf("inserted : %p\n", spt_e->user_vaddr);
