@@ -41,7 +41,7 @@ bool
 swap_in (void *addr)
 { 
 
-
+    return false;
 }
 
 /* 
@@ -62,7 +62,7 @@ bool
 swap_out (void)
 {
 
-
+    return false;
 }
 
 /* 
@@ -72,13 +72,13 @@ swap_out (void)
 void read_from_disk (uint8_t *frame, int index)
 {
 
-
+    return;
 }
 
 /* Write data to swap device from frame */
 void write_to_disk (uint8_t *frame, int index)
 {
 
-
+    return;
 }
 
