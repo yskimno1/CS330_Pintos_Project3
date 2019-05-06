@@ -188,9 +188,9 @@ p_argv(void* addr){
   if (!is_user_vaddr(addr) || addr < STACK_BOTTOM){
     exit(-1);
 	}
-	// if(is_bad_pointer(addr)){
-	// 	exit(-1);
-	// }
+	if(is_bad_pointer(addr)){
+		exit(-1);
+	}
   return (uint32_t *)(addr);
 }
 
@@ -289,11 +289,11 @@ int read (int fd, void *buffer, unsigned size){
 		exit(-1);
     return -1;
 	}
-	if (is_bad_pointer(buffer+size)){
-		filelock_release();
-		exit(-1);
-		return -1;
-	}
+	// if (is_bad_pointer(buffer+size)){
+	// 	filelock_release();
+	// 	exit(-1);
+	// 	return -1;
+	// }
 
 	if (fd == 0){			//keyboard input
 		for (i=0; i<size; i++) {
