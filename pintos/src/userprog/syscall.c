@@ -301,7 +301,7 @@ int read (int fd, void *buffer, unsigned size, void* esp){
 				ASSERT(0);
 			}
 			if(ptr >= esp - 32){
-				printf("grow stack at pointer %p!\n", ptr);
+				// printf("grow stack at pointer %p!\n", ptr);
 				bool success = grow_stack(ptr);
 				if(success == false){
 
@@ -427,7 +427,7 @@ bool
 is_bad_pointer(const char* ptr){
 	void* ptr_page = pagedir_get_page(thread_current()->pagedir, ptr);
 	if(!ptr_page){
-		printf("bad pointer at %p\n", ptr);
+		// printf("bad pointer at %p\n", ptr);
 		return true;
 	}
 	else return false;
