@@ -178,7 +178,7 @@ page_fault (struct intr_frame *f)
       }
 
       if((size_t) (PHYS_BASE - pg_round_down(fault_addr)) > LIMIT){
-         ASSERT(0);
+         // ASSERT(0);
          exit(-1);
       }
    //   printf(" fault : %p\n, esp %p, esp-32 : %p", fault_addr, f->esp, f->esp - SIZE);
@@ -198,19 +198,19 @@ page_fault (struct intr_frame *f)
          }
       }
       else{
-         ASSERT(0);
+         // ASSERT(0);
          exit(-1);
       }
       return;
    }
 
   if(!user){
-     ASSERT(0);
+   //   ASSERT(0);
      exit(-1);
   }
   else{
    //   printf("wrong case!\n");
-     ASSERT(0);
+   //   ASSERT(0);
      exit(-1);
   }
 //   exit(-1);
