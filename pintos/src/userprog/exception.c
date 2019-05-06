@@ -158,7 +158,9 @@ page_fault (struct intr_frame *f)
    // printf("before %p, round down : %p, PHYS_BASE : %p, temp : %p, limit %d\n", fault_addr, pg_round_down(fault_addr), PHYS_BASE, temp, LIMIT);
       
    if(is_user_vaddr(fault_addr) && not_present){
+      printf("6\n");
       lock_acquire(&lock_frame);
+      printf("5\n");
       // printf("list size : %d\n", list_size(&thread_current()->sup_page_table));
       struct sup_page_table_entry* spt_e = find_page(fault_addr);
       if(spt_e != NULL){ /* there exists a page */
