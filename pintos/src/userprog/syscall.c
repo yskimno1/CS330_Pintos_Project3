@@ -73,8 +73,9 @@ list_remove_by_fd(int fd){
 	}
 	if(matched) list_remove(e);
 	else{
-		printf("no fd, but close!\n");
-		ASSERT(0);
+		// printf("no fd, but close!\n");
+		// ASSERT(0);
+		return;
 	}
 }
 
@@ -330,8 +331,7 @@ int open (const char *file){
 		return -1;
 	}
 	struct file_entry* fe = malloc(sizeof(struct file_entry));
-	list_insert_ordered(&thread_current()->list_file, &fe->elem_file, list_compare_fd, 0);
-
+	
   filelock_release();
   struct thread *t = thread_current();
   int fd = (t->fd_vld)++;
@@ -445,9 +445,8 @@ void close (int fd){
 	struct file* f = t->fdt[fd];
 	t->fdt[fd] = NULL;
 	file_close(f);
-\
-	list_remove_by_fd(fd);
-  filelock_release();
+
+	filelock_release();
 }
 
 int mmap(int fd, void* addr){
