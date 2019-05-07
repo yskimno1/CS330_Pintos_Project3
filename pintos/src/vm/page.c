@@ -121,7 +121,7 @@ page_handling(struct sup_page_table_entry* spt_e){
     lock_acquire(&lock_frame);
     
     bool success = file_handling(spt_e);
-    
+
     lock_release(&lock_frame);
 
     return file_handling(spt_e);
@@ -142,7 +142,7 @@ file_handling(struct sup_page_table_entry* spt_e){
     }
 
     bool success = install_page(spt_e->user_vaddr, frame, spt_e->writable);
-    ASSERT(success);
+
     if(success == false){
         free_frame(frame);
 
