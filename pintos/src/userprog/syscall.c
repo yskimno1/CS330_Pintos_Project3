@@ -480,7 +480,7 @@ int mmap(int fd, void* addr){
 	while(read_bytes > 0){
 		size_t page_read_bytes = read_bytes < PGSIZE ? read_bytes : PGSIZE;
 		size_t page_zero_bytes = PGSIZE - page_read_bytes;
-		printf("mmap 3");
+		printf("mmap 3\n");
 		struct sup_page_table_entry* spt_e = find_page(addr);
 
 		if(spt_e == NULL){
@@ -492,6 +492,7 @@ int mmap(int fd, void* addr){
 			struct page_mmap* mmap_e = malloc(sizeof(struct page_mmap));
 			if(mmap_e == NULL){
 				free(spt_e);
+				lock_release(&lock_frame);
 				ASSERT(0);
 			}
 			mmap_e->spt_e = spt_e;
@@ -506,17 +507,18 @@ int mmap(int fd, void* addr){
 				return -1;
 				// ASSERT(0);
 			}
-			printf("mmap 4");
+			printf("mmap 4\n");
 			lock_release(&lock_frame);
-			printf("mmap 5");
+			printf("mmap 5\n");
 		}
 		/* do we need to check other mmaps? */
 		read_bytes -= page_read_bytes;
 		zero_bytes -= page_zero_bytes;
 		offset += page_read_bytes;
 	}
-	printf("mmap 6");
-
+	printf("mmap 6\n");
+	lock_release(&lock_frame);
+	
 	return thread_current()->map_id;
 }
 
