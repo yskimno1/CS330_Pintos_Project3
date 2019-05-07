@@ -590,10 +590,15 @@ filelock_init(){
 
 void
 filelock_acquire(){
+  printf("filelock acquire!\n");
   lock_acquire(&filelock);
+  printf("filelock acquire done!\n");
 }
 
 void
 filelock_release(){
+
+  printf("filelock release!\n");
   lock_release(&filelock);
+  printf("filelock release done!\n");
 }
