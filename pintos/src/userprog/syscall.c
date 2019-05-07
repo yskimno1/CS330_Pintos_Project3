@@ -505,8 +505,8 @@ int mmap(int fd, void* addr){
 				return -1;
 				// ASSERT(0);
 			}
+			lock_release(&lock_frame);
 		}
-
 		/* do we need to check other mmaps? */
 		read_bytes -= page_read_bytes;
 		zero_bytes -= page_zero_bytes;
@@ -518,6 +518,7 @@ int mmap(int fd, void* addr){
 }
 
 void unmap(int mapid){
+	printf("unmap came!\n");
 	return;
 }
 
