@@ -117,11 +117,15 @@ free_page(struct list_elem* e){
 bool
 page_handling(struct sup_page_table_entry* spt_e){
     // return swap_handling(spt_e);
-    printf("maybe here1\n");
+
     lock_acquire(&lock_frame);
-    printf("correct?\n");
-    return file_handling(spt_e);
+    
+    bool success = file_handling(spt_e);
+    
     lock_release(&lock_frame);
+
+    return file_handling(spt_e);
+
 }
 
 bool
