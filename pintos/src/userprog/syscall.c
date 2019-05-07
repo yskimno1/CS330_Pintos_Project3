@@ -38,6 +38,7 @@ static void seek (int fd, unsigned position);
 static int tell (int fd);
 static void close (int fd);
 static int mmap (int fd, void* addr);
+void unmap(int mapid);
 static bool fd_validate(int fd);
 static bool string_validate(const char* ptr);
 static bool is_bad_pointer(const char* ptr);
@@ -219,10 +220,11 @@ syscall_handler (struct intr_frame *f)
 		case SYS_MMAP:
 			argv0 = *p_argv(if_esp+4);
 			argv1 = *p_argv(if_esp+8);
-			mmap((int)argv0, (void *)argv1);
+			f->eax = mmap((int)argv0, (void *)argv1);
 			break;
 
 		case SYS_MUNMAP:
+			unmap(thread_current()->map_id);
 			break;
   	default:
   		break;
@@ -463,7 +465,10 @@ int mmap(int fd, void* addr){
 	}
 
 	struct file* f_reopen = file_reopen(f);
-	if(f_reopen == NULL) return -1;
+	if(f_reopen == NULL){
+		filelock_release();
+		return -1;
+	}
 
 	uint32_t read_bytes = file_length(f_reopen);
 	uint32_t zero_bytes = 0;
@@ -507,9 +512,13 @@ int mmap(int fd, void* addr){
 		zero_bytes -= page_zero_bytes;
 		offset += page_read_bytes;
 	}
-	lock_release(&lock_frame);
+
 	filelock_release();
 	return thread_current()->map_id;
+}
+
+void unmap(int mapid){
+	return;
 }
 
 bool
