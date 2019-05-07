@@ -249,7 +249,7 @@ check_page(void* buffer, unsigned size, void* esp){
 	void* ptr = buffer;
 	for(;ptr<buffer+size; ptr++){
 		if (is_bad_pointer(ptr)){
-
+			printf("came!\n");
 			struct sup_page_table_entry* spt_e = find_page(ptr);
 			if(spt_e != NULL){
 				printf("need to load page in syscall.read!\n");
