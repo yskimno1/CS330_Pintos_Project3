@@ -468,7 +468,7 @@ int mmap(int fd, void* addr){
 	uint32_t read_bytes = file_length(f_reopen);
 	uint32_t zero_bytes = 0;
 
-	// printf("f_reopen read bytes : %d\n", read_bytes);
+	printf("f_reopen read bytes : %d\n", read_bytes);
 	
 	// while(read_bytes > 0 || zero_bytes > 0){
 	// 	size_t page_read_bytes = read_bytes < PGSIZE ? read_bytes : PGSIZE;
