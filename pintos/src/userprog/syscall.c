@@ -220,11 +220,15 @@ syscall_handler (struct intr_frame *f)
 		case SYS_MMAP:
 			argv0 = *p_argv(if_esp+4);
 			argv1 = *p_argv(if_esp+8);
+			filelock_acquire();
 			f->eax = mmap((int)argv0, (void *)argv1);
+			filelock_release();
 			break;
 
 		case SYS_MUNMAP:
+			filelock_acquire();
 			unmap(thread_current()->map_id);
+			filelock_release();
 			break;
   	default:
   		break;
@@ -455,36 +459,33 @@ void close (int fd){
 }
 
 int mmap(int fd, void* addr){
-	filelock_acquire();
-
+	printf("mmap start\n");
 	struct thread* curr = thread_current();
 	struct file* f = curr->fdt[fd];
 	if(f == NULL){
-		filelock_release();
 		return -1;
 	}
 
 	struct file* f_reopen = file_reopen(f);
 	if(f_reopen == NULL){
-		filelock_release();
 		return -1;
 	}
 
 	uint32_t read_bytes = file_length(f_reopen);
 	uint32_t zero_bytes = 0;
 	off_t offset = 0;
-
+	printf("mmap 1\n");
 	lock_acquire(&lock_frame);
+	printf("mmap 2\n");
 	while(read_bytes > 0){
 		size_t page_read_bytes = read_bytes < PGSIZE ? read_bytes : PGSIZE;
 		size_t page_zero_bytes = PGSIZE - page_read_bytes;
-
+		printf("mmap 3");
 		struct sup_page_table_entry* spt_e = find_page(addr);
 
 		if(spt_e == NULL){
 			spt_e = allocate_page(addr, false, CREATE_MMAP, page_read_bytes, page_zero_bytes, f_reopen, offset, true);
 			if(spt_e == NULL){
-				filelock_release();
 				lock_release(&lock_frame);
 				return false;
 			}
@@ -501,19 +502,21 @@ int mmap(int fd, void* addr){
 				list_remove(&mmap_e->elem_mmap);
 				thread_current()->map_id -= 1;
 				lock_release(&lock_frame);
-				filelock_release();
+
 				return -1;
 				// ASSERT(0);
 			}
+			printf("mmap 4");
 			lock_release(&lock_frame);
+			printf("mmap 5");
 		}
 		/* do we need to check other mmaps? */
 		read_bytes -= page_read_bytes;
 		zero_bytes -= page_zero_bytes;
 		offset += page_read_bytes;
 	}
+	printf("mmap 6");
 
-	filelock_release();
 	return thread_current()->map_id;
 }
 
