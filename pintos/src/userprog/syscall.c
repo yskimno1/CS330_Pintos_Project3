@@ -511,14 +511,14 @@ int mmap(int fd, void* addr){
 			lock_release(&lock_frame);
 			printf("mmap 5\n");
 		}
+		else lock_release(&lock_frame);
 		/* do we need to check other mmaps? */
 		read_bytes -= page_read_bytes;
 		zero_bytes -= page_zero_bytes;
 		offset += page_read_bytes;
 	}
 	printf("mmap 6\n");
-	lock_release(&lock_frame);
-	
+
 	return thread_current()->map_id;
 }
 
