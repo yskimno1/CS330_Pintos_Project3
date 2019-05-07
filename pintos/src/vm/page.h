@@ -29,8 +29,8 @@ struct sup_page_table_entry
 };
 
 enum file_type{
-	swap = 0,
-	mmap = 1
+	TYPE_SWAP = 0,
+	TYPE_MMAP = 1
 };
 
 enum palloc_type{
