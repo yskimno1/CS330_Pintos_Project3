@@ -111,7 +111,7 @@ struct thread
     unsigned magic;                     /* Detects stack overflow. */
 
     struct list sup_page_table;
-
+    struct list list_file;
     //struct ~~ s_pt;
   };
 
