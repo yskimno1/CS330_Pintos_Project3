@@ -469,21 +469,47 @@ int mmap(int fd, void* addr){
 	uint32_t zero_bytes = 0;
 
 	printf("f_reopen read bytes : %d\n", read_bytes);
-	
-	// while(read_bytes > 0 || zero_bytes > 0){
-	// 	size_t page_read_bytes = read_bytes < PGSIZE ? read_bytes : PGSIZE;
-	// 	size_t page_zero_bytes = PGSIZE - page_read_bytes;
-	
-	// }
-	// if(read_bytes > 0){
-	// 	struct sup_page_table_entry* spt_e = find_page(addr);
+	off_t offset = 0;
+	while(read_bytes > 0){
+		size_t page_read_bytes = read_bytes < PGSIZE ? read_bytes : PGSIZE;
+		size_t page_zero_bytes = PGSIZE - page_read_bytes;
+		lock_acquire(&lock_frame);
+		struct sup_page_table_entry* spt_e = find_page(addr);
 
-
-	// }
-	/* insert to page table.. */
+		if(spt_e == NULL){
+			spt_e = allocate_page(addr, false, CREATE_MMAP, page_read_bytes, page_zero_bytes, f_reopen, offset, true);
+			if(spt_e == NULL){
+				filelock_release();
+				lock_release(&lock_frame);
+				return false;
+			}
+			struct page_mmap* mmap_e = malloc(sizeof(struct page_mmap));
+			if(mmap_e == NULL){
+				free(spt_e);
+				ASSERT(0);
+			}
+			mmap_e->spt_e = spt_e;
+			list_push_back(&thread_current()->list_mmap, &mmap_e->elem_mmap);
+			bool success = page_insert(spt_e);
+			if(success == false){
+				printf("need to unmap!\n");
+				list_remove(&mmap_e->elem_mmap);
+				thread_current()->map_id -= 1;
+				lock_release(&lock_frame);
+				filelock_release();
+				return -1;
+				// ASSERT(0);
+			}
+		}
+		lock_release(&lock_frame);
+		/* do we need to check other mmaps? */
+		read_bytes -= page_read_bytes;
+		zero_bytes -= page_zero_bytes;
+		offset += page_read_bytes;
+	}
 
 	filelock_release();
-	return 0;
+	return thread_current()->map_id;
 }
 
 bool
