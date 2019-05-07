@@ -14,6 +14,7 @@
 #include "userprog/process.h"
 #include "filesys/off_t.h"
 #include "vm/page.h"
+#include "vm/frame.h"
 // struct file 
 //   {
 //     struct inode *inode;        /* File's inode. */
@@ -249,7 +250,7 @@ check_page(void* buffer, unsigned size, void* esp){
 	void* ptr = buffer;
 	for(;ptr<buffer+size; ptr++){
 		if (is_bad_pointer(ptr)){
-			printf("came!\n");
+			// printf("came!\n");
 			struct sup_page_table_entry* spt_e = find_page(ptr);
 			if(spt_e != NULL){
 				printf("need to load page in syscall.read!\n");
@@ -257,7 +258,9 @@ check_page(void* buffer, unsigned size, void* esp){
 			}
 			if(ptr >= esp - 32){
 				// printf("grow stack at pointer %p!\n", ptr);
+				lock_acquire(&lock_frame);
 				bool success = grow_stack(ptr);
+				lock_release(&lock_frame);
 				if(success == false){
 
 					filelock_release();
