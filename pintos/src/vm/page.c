@@ -124,7 +124,7 @@ page_handling(struct sup_page_table_entry* spt_e){
 
     lock_release(&lock_frame);
 
-    return file_handling(spt_e);
+    return success;
 
 }
 
