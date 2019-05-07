@@ -467,13 +467,13 @@ int mmap(int fd, void* addr){
 
 	uint32_t read_bytes = file_length(f_reopen);
 	uint32_t zero_bytes = 0;
-
-	printf("f_reopen read bytes : %d\n", read_bytes);
 	off_t offset = 0;
+
+	lock_acquire(&lock_frame);
 	while(read_bytes > 0){
 		size_t page_read_bytes = read_bytes < PGSIZE ? read_bytes : PGSIZE;
 		size_t page_zero_bytes = PGSIZE - page_read_bytes;
-		lock_acquire(&lock_frame);
+
 		struct sup_page_table_entry* spt_e = find_page(addr);
 
 		if(spt_e == NULL){
@@ -501,13 +501,13 @@ int mmap(int fd, void* addr){
 				// ASSERT(0);
 			}
 		}
-		lock_release(&lock_frame);
+
 		/* do we need to check other mmaps? */
 		read_bytes -= page_read_bytes;
 		zero_bytes -= page_zero_bytes;
 		offset += page_read_bytes;
 	}
-
+	lock_release(&lock_frame);
 	filelock_release();
 	return thread_current()->map_id;
 }
