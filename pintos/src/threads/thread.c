@@ -459,6 +459,7 @@ init_thread (struct thread *t, const char *name, int priority)
   t->fd_vld = 3;    //0,1,2 invalid
   list_init(&t->list_children);
   list_init(&t->sup_page_table);
+  list_init(&t->list_file);
 
   t->th_parent = running_thread();
   t->is_loaded = false;

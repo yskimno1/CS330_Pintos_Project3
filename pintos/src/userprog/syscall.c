@@ -32,13 +32,50 @@ static int remove (const char *file);
 static int open (const char *file);
 static int filesize (int fd);
 static int read (int fd, void *buffer, unsigned size, void* esp);
-static int write (int fd, const void *buffer, unsigned size);
+static int write (int fd, const void *buffer, unsigned size, void* esp);
 static void seek (int fd, unsigned position);
 static int tell (int fd);
 static void close (int fd);
 static bool fd_validate(int fd);
 static bool string_validate(const char* ptr);
 static bool is_bad_pointer(const char* ptr);
+
+struct file_entry{
+	int fd;
+	struct file* file;
+	struct list_elem elem_file;
+};
+
+bool
+list_compare_fd(const struct list_elem* a, const struct list_elem* b, void* aux){
+    struct file_entry* fe_1 = list_entry(a, struct file_entry, elem_file);
+    struct file_entry* fe_2 = list_entry(b, struct file_entry, elem_file);
+    return (fe_1->fd < fe_2->fd); 
+}
+
+void
+list_remove_by_fd(int fd){
+	struct list_elem* e;
+	int matched = 0;
+	struct thread* curr = thread_current();
+	struct file_entry* fe;
+	// printf("finding page address %p\n", &curr->sup_page_table);
+	if(!list_empty(&curr->list_file)){
+			for(e=list_begin(&curr->list_file); e!=list_end(&curr->list_file); e = list_next(e)){
+					fe = list_entry(e, struct file_entry, elem_file);
+					// printf("iteration : %p\n", spt_e->user_vaddr);
+					if(fe->fd == fd){
+						matched = 1;
+						break;
+					} 
+			}
+	}
+	if(matched) list_remove(e);
+	else{
+		printf("no fd, but close!\n");
+		ASSERT(0);
+	}
+}
 
 void
 syscall_init (void) 
@@ -142,7 +179,7 @@ syscall_handler (struct intr_frame *f)
       argv0 = *p_argv(if_esp+4);
       argv1 = *p_argv(if_esp+8);
       argv2 = *p_argv(if_esp+12);
-  		f->eax = write((int)argv0, (void *)argv1, (unsigned)argv2);
+  		f->eax = write((int)argv0, (void *)argv1, (unsigned)argv2, if_esp);
   		break;
 
   	case SYS_SEEK:		/* Change position in a file. */
@@ -175,6 +212,14 @@ syscall_handler (struct intr_frame *f)
 			close((int)argv0);
 			break;
 
+
+		case SYS_MMAP:
+			argv0 = *p_argv(if_esp+4);
+
+			break;
+
+		case SYS_MUNMAP:
+			break;
   	default:
   		break;
   	}
@@ -194,6 +239,30 @@ p_argv(void* addr){
 	// }
 
   return (uint32_t *)(addr);
+}
+
+void
+check_page(void* buffer, unsigned size, void* esp){
+	void* ptr = buffer;
+	for(;ptr<buffer+size; ptr++){
+		if (is_bad_pointer(ptr)){
+
+			struct sup_page_table_entry* spt_e = find_page(ptr);
+			if(spt_e != NULL){
+				printf("need to load page in syscall.read!\n");
+				ASSERT(0);
+			}
+			if(ptr >= esp - 32){
+				// printf("grow stack at pointer %p!\n", ptr);
+				bool success = grow_stack(ptr);
+				if(success == false){
+
+					filelock_release();
+					exit(-1);
+				}
+			}
+		}
+	}
 }
 
 void 
@@ -258,6 +327,8 @@ int open (const char *file){
 		filelock_release();
 		return -1;
 	}
+	struct file_entry* fe = malloc(sizeof(struct file_entry));
+	list_insert_ordered(&thread_current()->list_file, &fe->elem_file, list_compare_fd, 0);
 
   filelock_release();
   struct thread *t = thread_current();
@@ -291,26 +362,8 @@ int read (int fd, void *buffer, unsigned size, void* esp){
 		exit(-1);
     return -1;
 	}
-	void* ptr = buffer;
-	for(;ptr<buffer+size; ptr++){
-		if (is_bad_pointer(ptr)){
 
-			struct sup_page_table_entry* spt_e = find_page(ptr);
-			if(spt_e != NULL){
-				printf("need to load page in syscall.read!\n");
-				ASSERT(0);
-			}
-			if(ptr >= esp - 32){
-				// printf("grow stack at pointer %p!\n", ptr);
-				bool success = grow_stack(ptr);
-				if(success == false){
-
-					filelock_release();
-					exit(-1);
-				}
-			}
-		}
-	}
+	check_page(buffer, size, esp);
 
 	if (fd == 0){			//keyboard input
 		for (i=0; i<size; i++) {
@@ -333,7 +386,7 @@ int read (int fd, void *buffer, unsigned size, void* esp){
 	return cnt;
 }
 
-int write (int fd, const void *buffer, unsigned size){
+int write (int fd, const void *buffer, unsigned size, void* esp){
 	filelock_acquire();
   int cnt=-1;
   if (!fd_validate(fd)){
@@ -345,15 +398,7 @@ int write (int fd, const void *buffer, unsigned size){
 		exit(-1);
     return cnt;
 	}
-	void* ptr = buffer;
-	for(;ptr<buffer+size; ptr++){
-		if (is_bad_pointer(ptr)){
-			filelock_release();
-			exit(-1);
-			return -1;
-		}
-	}
-
+	check_page_or_not(buffer, size, esp);
 
 	if (fd ==0){
 		filelock_release();
@@ -398,7 +443,43 @@ void close (int fd){
 	struct file* f = t->fdt[fd];
 	t->fdt[fd] = NULL;
 	file_close(f);
+\
+	list_remove_by_fd(fd);
   filelock_release();
+}
+
+int mmap(int fd, void* addr){
+	filelock_acquire();
+
+	struct thread* curr = thread_current();
+	struct file* f = curr->fdt[fd];
+	if(f == NULL){
+		filelock_release();
+		return -1;
+	}
+
+	struct file* f_reopen = file_reopen(f);
+	if(f_reopen == NULL) return -1;
+
+	uint32_t read_bytes = file_length(f_reopen);
+	uint32_t zero_bytes = 0;
+
+	// printf("f_reopen read bytes : %d\n", read_bytes);
+	
+	// while(read_bytes > 0 || zero_bytes > 0){
+	// 	size_t page_read_bytes = read_bytes < PGSIZE ? read_bytes : PGSIZE;
+	// 	size_t page_zero_bytes = PGSIZE - page_read_bytes;
+	
+	// }
+	// if(read_bytes > 0){
+	// 	struct sup_page_table_entry* spt_e = find_page(addr);
+
+
+	// }
+	/* insert to page table.. */
+
+	filelock_release();
+	return 0;
 }
 
 bool
