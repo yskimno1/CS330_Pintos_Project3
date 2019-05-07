@@ -459,7 +459,7 @@ void close (int fd){
 }
 
 int mmap(int fd, void* addr){
-	printf("mmap start\n");
+
 	struct thread* curr = thread_current();
 	struct file* f = curr->fdt[fd];
 	if(f == NULL){
