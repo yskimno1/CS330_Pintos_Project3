@@ -474,17 +474,14 @@ int mmap(int fd, void* addr){
 	uint32_t read_bytes = file_length(f_reopen);
 	uint32_t zero_bytes = 0;
 	off_t offset = 0;
-	printf("mmap 1\n");
-	lock_acquire(&lock_frame);
-	printf("mmap 2\n");
 
 	while(read_bytes > 0){
 		size_t page_read_bytes = read_bytes < PGSIZE ? read_bytes : PGSIZE;
 		size_t page_zero_bytes = PGSIZE - page_read_bytes;
-		printf("mmap 3\n");
 		struct sup_page_table_entry* spt_e = find_page(addr);
 
 		if(spt_e == NULL){
+			lock_acquire(&lock_frame);
 			spt_e = allocate_page(addr, false, CREATE_MMAP, page_read_bytes, page_zero_bytes, f_reopen, offset, true);
 			if(spt_e == NULL){
 				lock_release(&lock_frame);
@@ -509,14 +506,16 @@ int mmap(int fd, void* addr){
 				lock_release(&lock_frame);
 				return -1;
 			}
+			else{
+					lock_release(&lock_frame);
+			}
 		}
 		/* do we need to check other mmaps? */
 		read_bytes -= page_read_bytes;
 		zero_bytes -= page_zero_bytes;
 		offset += page_read_bytes;
 	}
-	lock_release(&lock_frame);
-	printf("mmap 6\n");
+
 
 	return thread_current()->map_id;
 }
