@@ -112,6 +112,8 @@ struct thread
 
     struct list sup_page_table;
     struct list list_file;
+    struct list list_mmap;
+    int map_id;
     //struct ~~ s_pt;
   };
 

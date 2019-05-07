@@ -13,9 +13,6 @@
 
 // #include "filesys/filesys.h"
 
-/*
- * Initialize supplementary page table
- */
 
 
 /* true if A is less than B */
@@ -61,8 +58,9 @@ allocate_page (void* addr, bool loaded, enum palloc_type p_type, uint32_t read_b
         spt_e->user_vaddr = addr;
         spt_e->loaded = loaded;
         spt_e->writable = writable;
+        spt_e->file_type = TYPE_STACK;
     }
-    else if(p_type == LOAD_SEGMENT){
+    else if(p_type == LOAD_SEGMENT || p_type == CREATE_MMAP){
         spt_e->user_vaddr = addr;
         spt_e->loaded = loaded;
         spt_e->read_bytes = read_bytes;
@@ -70,6 +68,13 @@ allocate_page (void* addr, bool loaded, enum palloc_type p_type, uint32_t read_b
         spt_e->offset = offset;
         spt_e->file = file;
         spt_e->writable = writable;
+        spt_e->file_type = TYPE_FILE;
+        if(p_type == CREATE_MMAP){
+            spt_e->file_type = TYPE_MMAP;
+            spt_e->map_id = thread_current()->map_id;
+            thread_current()->map_id += 1;
+
+        }
         // printf("read bytes : %d, offset %d, address %p, file %p\n", spt_e->read_bytes, spt_e->offset, spt_e->user_vaddr, file);
     }
     else ASSERT(0);

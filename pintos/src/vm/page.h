@@ -25,18 +25,29 @@ struct sup_page_table_entry
 	bool writable;
 	bool loaded;
 
-	
+	int fd_num;
+	int file_type;
+
+	int map_id;
 };
 
-enum file_type{
+struct page_mmap{
+    struct sup_page_table_entry* spt_e;
+    struct list_elem elem_mmap;
+};
+
+enum TYPE_FILE{
 	TYPE_SWAP = 0,
-	TYPE_MMAP = 1
+	TYPE_MMAP = 1,
+	TYPE_STACK = 2,
+	TYPE_FILE = 3
 };
 
 enum palloc_type{
     GROW_STACK=0,
 	PAGE_FAULT=1,
-	LOAD_SEGMENT=2
+	LOAD_SEGMENT=2,
+	CREATE_MMAP = 3 
 };
 
 bool list_less(const struct list_elem* a, const struct list_elem* b, void* aux);

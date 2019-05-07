@@ -460,10 +460,13 @@ init_thread (struct thread *t, const char *name, int priority)
   list_init(&t->list_children);
   list_init(&t->sup_page_table);
   list_init(&t->list_file);
+  list_init(&t->list_mmap);
 
   t->th_parent = running_thread();
   t->is_loaded = false;
   t->is_exited = false;
+
+  t->map_id = 0;
 }
 
 /* Allocates a SIZE-byte frame at the top of thread T's stack and
