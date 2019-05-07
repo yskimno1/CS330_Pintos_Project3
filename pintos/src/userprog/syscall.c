@@ -477,6 +477,7 @@ int mmap(int fd, void* addr){
 	printf("mmap 1\n");
 	lock_acquire(&lock_frame);
 	printf("mmap 2\n");
+
 	while(read_bytes > 0){
 		size_t page_read_bytes = read_bytes < PGSIZE ? read_bytes : PGSIZE;
 		size_t page_zero_bytes = PGSIZE - page_read_bytes;
@@ -489,34 +490,32 @@ int mmap(int fd, void* addr){
 				lock_release(&lock_frame);
 				return false;
 			}
+
 			struct page_mmap* mmap_e = malloc(sizeof(struct page_mmap));
 			if(mmap_e == NULL){
 				free(spt_e);
 				lock_release(&lock_frame);
-				ASSERT(0);
+				return false;
 			}
+
 			mmap_e->spt_e = spt_e;
 			list_push_back(&thread_current()->list_mmap, &mmap_e->elem_mmap);
+
 			bool success = page_insert(spt_e);
 			if(success == false){
 				printf("need to unmap!\n");
 				list_remove(&mmap_e->elem_mmap);
 				thread_current()->map_id -= 1;
 				lock_release(&lock_frame);
-
 				return -1;
-				// ASSERT(0);
 			}
-			printf("mmap 4\n");
-			lock_release(&lock_frame);
-			printf("mmap 5\n");
 		}
-		else lock_release(&lock_frame);
 		/* do we need to check other mmaps? */
 		read_bytes -= page_read_bytes;
 		zero_bytes -= page_zero_bytes;
 		offset += page_read_bytes;
 	}
+	lock_release(&lock_frame);
 	printf("mmap 6\n");
 
 	return thread_current()->map_id;
