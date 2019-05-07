@@ -36,6 +36,7 @@ static int write (int fd, const void *buffer, unsigned size, void* esp);
 static void seek (int fd, unsigned position);
 static int tell (int fd);
 static void close (int fd);
+static int mmap (int fd, void* addr);
 static bool fd_validate(int fd);
 static bool string_validate(const char* ptr);
 static bool is_bad_pointer(const char* ptr);
@@ -215,7 +216,8 @@ syscall_handler (struct intr_frame *f)
 
 		case SYS_MMAP:
 			argv0 = *p_argv(if_esp+4);
-
+			argv1 = *p_argv(if_esp+8);
+			mmap((int)argv0, (void *)argv1);
 			break;
 
 		case SYS_MUNMAP:
