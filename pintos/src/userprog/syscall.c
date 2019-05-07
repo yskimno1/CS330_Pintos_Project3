@@ -400,7 +400,7 @@ int write (int fd, const void *buffer, unsigned size, void* esp){
 		exit(-1);
     return cnt;
 	}
-	check_page_or_not(buffer, size, esp);
+	check_page(buffer, size, esp);
 
 	if (fd ==0){
 		filelock_release();
