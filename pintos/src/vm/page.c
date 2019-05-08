@@ -45,7 +45,6 @@ page_insert(struct sup_page_table_entry* spt_e){
     //list_insert_ordered(&curr->sup_page_table, &spt_e->elem, list_less, 0);
 }
 
-
 /*
  * Make new supplementary page table entry for addr 
  */
@@ -58,7 +57,7 @@ allocate_page (void* addr, bool loaded, enum palloc_type p_type, uint32_t read_b
         spt_e->user_vaddr = addr;
         spt_e->loaded = loaded;
         spt_e->writable = writable;
-        spt_e->file_type = TYPE_STACK;
+        spt_e->file_type = TYPE_SWAP;
     }
     else if(p_type == LOAD_SEGMENT || p_type == CREATE_MMAP){
         spt_e->user_vaddr = addr;
@@ -119,7 +118,7 @@ page_handling(struct sup_page_table_entry* spt_e){
     lock_acquire(&lock_frame);
     bool success;
     if(spt_e->file_type == TYPE_FILE || spt_e->file_type == TYPE_MMAP) success = file_handling(spt_e);
-
+    else if(spt_e->file_type == TYPE_SWAP) success = swap_handling(spt_e);
     lock_release(&lock_frame);
 
     return success;
@@ -132,7 +131,7 @@ file_handling(struct sup_page_table_entry* spt_e){
 
     if(spt_e->read_bytes == 0) frame = allocate_frame(spt_e, PAL_USER|PAL_ZERO);
     else frame = allocate_frame(spt_e, PAL_USER);
-    ASSERT(frame);
+    // ASSERT(frame);
     if(frame == NULL){
 
         return false;
@@ -167,6 +166,14 @@ file_handling(struct sup_page_table_entry* spt_e){
 
 bool
 swap_handling(struct sup_page_table_entry* spt_e){
+    void* frame = allocate_frame(spt_e, PAL_USER);
+    if(frame == NULL)
+    // ASSERT(frame);
+    if(frame == NULL){
+        return false;
+    }
+    bool success = install_page(spt_e->user_vaddr, frame, spt_e->writable);
+
     return false;
 }
 

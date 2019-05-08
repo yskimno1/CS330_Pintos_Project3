@@ -26,6 +26,18 @@ swap_init (void)
     lock_init(&swap_lock);
 }
 
+
+disk_sector_t
+get_empty_sector_num(void){
+
+    size_t bitmap_idx = bitmap_scan_and_flip(swap_table, 0, 1, false);
+    if(bitmap_idx != BITMAP_ERROR) return bitmap_idx * PGSIZE/DISK_SECTOR_SIZE;
+    else{
+        PANIC("swap size if full!\n");
+    }
+}
+
+
 /*
  * Reclaim a frame from swap device.
  * 1. Check that the page has been already evicted. 
@@ -39,26 +51,19 @@ swap_init (void)
  * of the disk into the frame. 
  */ 
 
-disk_sector_t
-get_empty_sector_num(void){
-
-    size_t index_num = bitmap_scan_and_flip(swap_table, 0, 1, false);
-    if(index_num != BITMAP_ERROR) return index_num * DISK_SECTOR_SIZE/PGSIZE;
-    else{
-        PANIC("swap size if full!\n");
-    }
-}
-
 bool 
 swap_in (void *frame_addr, disk_sector_t sector_num)
 { 
     lock_acquire(&swap_lock);
-    bool success = bitmap_test(swap_table, sector_num);
-    
-    
+    disk_sector_t bitmap_idx = sector_num * DISK_SECTOR_SIZE/PGSIZE;
+    bool success = bitmap_test(swap_table, bitmap_idx);
+    if(success == false) PANIC("invalid swap space!");
+
+    bitmap_flip(swap_table, bitmap_idx);
+    read_from_disk(frame_addr, sector_num);
 
     lock_release(&swap_lock);
-    return false;
+    return true;
 }
 
 /* 
@@ -75,16 +80,17 @@ swap_in (void *frame_addr, disk_sector_t sector_num)
  * 4. Find a free block to write you data. Use swap table to get track
  * of in-use and free swap slots.
  */
-bool
+/* frame -> swap */
+disk_sector_t
 swap_out (void* frame_addr)
 {
     lock_acquire(&swap_lock);
     void* addr =pg_round_down(frame_addr);
     disk_sector_t sector_num = get_empty_sector_num();
-    write_to_disk_all(frame_addr, sector_num);
+    write_to_disk(frame_addr, sector_num);
 
     lock_release(&swap_lock);
-    return false;
+    return sector_num;
 }
 
 /* 
@@ -93,18 +99,21 @@ swap_out (void* frame_addr)
  */
 void read_from_disk (void *frame_addr, disk_sector_t sector_num)
 {
-
-
+    disk_sector_t i;
+    for(i=0; i<PGSIZE/DISK_SECTOR_SIZE; i++){
+        void* dst = i*DISK_SECTOR_SIZE + frame_addr;
+        disk_read(swap_device, i+sector_num, dst);
+    }
     return;
 }
 
 /* Write data to swap device from frame */
-void write_to_disk_all (void *frame_addr, disk_sector_t sector_num)
+void write_to_disk (void *frame_addr, disk_sector_t sector_num)
 {
     disk_sector_t i;
-    for(i=sector_num; i<sector_num + PGSIZE/DISK_SECTOR_SIZE; i++){
-        void* dst = DISK_SECTOR_SIZE*(i-sector_num) + frame_addr; // total num is PGSIZE
-        disk_write(swap_device, i, frame_addr);
+    for(i=0; i<PGSIZE/DISK_SECTOR_SIZE; i++){    
+        void* dst = i*DISK_SECTOR_SIZE + frame_addr; // total num is PGSIZE
+        disk_write(swap_device, i+sector_num, dst);
     }
     return;
 }

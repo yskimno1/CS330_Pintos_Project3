@@ -48,7 +48,10 @@ allocate_frame (struct sup_page_table_entry* spt_e, enum palloc_flags flag)
     ASSERT(flag & PAL_USER);
 
     uint8_t* frame = palloc_get_page(flag);
-    ASSERT(frame!=NULL);
+    if(frame == NULL){
+        /* need to evict */
+        evict_frame();
+    }
     // if(frame == NULL) PANIC("frame is full");
     struct frame_table_entry* fte = create_frame_table_entry(frame, spt_e);
     ASSERT(fte != NULL);
@@ -76,6 +79,14 @@ search_frame_table_entry (void* frame){
 }
 
 void*
+evict_frame (void){
+    
+
+
+    return;
+}
+
+void*
 free_frame (void* frame){
     // lock_acquire(&lock_frame);
     struct list_elem* e;
@@ -91,6 +102,4 @@ free_frame (void* frame){
             }
         }
     }
-
-    // lock_release(&lock_frame);
 }
