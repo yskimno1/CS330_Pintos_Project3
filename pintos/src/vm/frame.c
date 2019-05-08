@@ -78,10 +78,8 @@ search_frame_table_entry (void* frame){
   return NULL;
 }
 
-void*
+void
 evict_frame (void){
-    
-
 
     return;
 }
