@@ -149,7 +149,7 @@ file_handling(struct sup_page_table_entry* spt_e){
         off_t temp = file_read_at (spt_e->file, frame, spt_e->read_bytes, spt_e->offset);
         // printf("temp : %d\n", temp);
         if (temp != (int) spt_e->read_bytes){
-            // printf("%d vs %d\n", temp, (int) spt_e->read_bytes);
+            printf("%d vs %d\n", temp, (int) spt_e->read_bytes);
             free_frame(frame);
 
             ASSERT(0);
@@ -173,6 +173,12 @@ swap_handling(struct sup_page_table_entry* spt_e){
         return false;
     }
     bool success = install_page(spt_e->user_vaddr, frame, spt_e->writable);
+    if(success == false){
+        free_frame(frame);
+        return false;
+    }
+
+
 
     return false;
 }
