@@ -38,7 +38,7 @@ static void seek (int fd, unsigned position);
 static int tell (int fd);
 static void close (int fd);
 static int mmap (int fd, void* addr);
-void unmap(int mapid);
+void munmap(int mapid);
 static bool fd_validate(int fd);
 static bool string_validate(const char* ptr);
 static bool is_bad_pointer(const char* ptr);
@@ -227,7 +227,7 @@ syscall_handler (struct intr_frame *f)
 
 		case SYS_MUNMAP:
 			filelock_acquire();
-			unmap(thread_current()->map_id);
+			munmap(thread_current()->map_id);
 			filelock_release();
 			break;
   	default:
@@ -288,7 +288,7 @@ exit (int status){
   t->exit_status = status;
 	printf("%s: exit(%d)\n", thread_name(), status);
 	int i; 
-	for (i = 3; i < 131; i++) {
+	for (i = 3; i < FILE_MAX; i++) {
       if (t->fdt[i] != NULL){
         file_close(t->fdt[i]);
         t->fdt[i] = NULL;
@@ -458,7 +458,7 @@ void close (int fd){
 	filelock_release();
 }
 
-int mmap(int fd, void* addr){
+int mmap(int fd, void* addr){ // needs lazy loading
 
 	struct thread* curr = thread_current();
 	struct file* f = curr->fdt[fd];
@@ -520,8 +520,11 @@ int mmap(int fd, void* addr){
 	return thread_current()->map_id;
 }
 
-void unmap(int mapid){
+void munmap(int mapid){
 	printf("unmap came!\n");
+
+
+
 	return;
 }
 
@@ -529,7 +532,7 @@ bool
 fd_validate(int fd){
 	struct thread* t = thread_current();
 	bool val = true;
-	val = val && fd>=0 && fd<131 && (fd < (t->fd_vld));
+	val = val && fd>=0 && fd<FILE_MAX && (fd < (t->fd_vld));
 	if (fd >2 )
 		val = val && t->fdt[fd] != NULL;
 	return val;
