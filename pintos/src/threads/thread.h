@@ -81,6 +81,8 @@ typedef int tid_t;
    only because they are mutually exclusive: only a thread in the
    ready state is on the run queue, whereas only a thread in the
    blocked state is on a semaphore wait list. */
+
+#define FILE_MAX 131
 struct thread
   {
     /* Owned by thread.c. */
@@ -95,7 +97,7 @@ struct thread
 
     /* Owned by userprog/process.c. */
     uint32_t *pagedir;                  /* Page directory. */
-    struct file* fdt[131];              /* file descriptor table, max 128*/
+    struct file* fdt[FILE_MAX];              /* file descriptor table, max 128*/
     int fd_vld;                         /* vaild descriptor number for next open(fdt[fd_vld] == NULL) */
 
     struct semaphore sema_load;

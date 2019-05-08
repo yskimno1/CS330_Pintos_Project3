@@ -75,7 +75,6 @@ allocate_page (void* addr, bool loaded, enum palloc_type p_type, uint32_t read_b
             thread_current()->map_id += 1;
 
         }
-        // printf("read bytes : %d, offset %d, address %p, file %p\n", spt_e->read_bytes, spt_e->offset, spt_e->user_vaddr, file);
     }
     else ASSERT(0);
 
@@ -116,16 +115,14 @@ free_page(struct list_elem* e){
 
 bool
 page_handling(struct sup_page_table_entry* spt_e){
-    // return swap_handling(spt_e);
 
     lock_acquire(&lock_frame);
-    
-    bool success = file_handling(spt_e);
+    bool success;
+    if(spt_e->file_type == TYPE_FILE || spt_e->file_type == TYPE_MMAP) success = file_handling(spt_e);
 
     lock_release(&lock_frame);
 
     return success;
-
 }
 
 bool

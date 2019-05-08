@@ -29,6 +29,7 @@ struct sup_page_table_entry
 	int file_type;
 
 	int map_id;
+	int swap_num;
 };
 
 struct page_mmap{
