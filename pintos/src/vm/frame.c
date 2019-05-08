@@ -3,6 +3,7 @@
 
 #include "threads/thread.h"
 #include "threads/palloc.h"
+#include "userprog/pagedir.h"
 #include "vm/page.h"
 #include "vm/frame.h"
 /*
@@ -50,7 +51,9 @@ allocate_frame (struct sup_page_table_entry* spt_e, enum palloc_flags flag)
     uint8_t* frame = palloc_get_page(flag);
     if(frame == NULL){
         /* need to evict */
-        evict_frame();
+        bool eviction_success = evict_frame();
+        if(eviction_success) frame = palloc_get_page(flag);
+        else ASSERT(0);
     }
     // if(frame == NULL) PANIC("frame is full");
     struct frame_table_entry* fte = create_frame_table_entry(frame, spt_e);
@@ -78,10 +81,44 @@ search_frame_table_entry (void* frame){
   return NULL;
 }
 
-void
+bool
 evict_frame (void){
 
-    return;
+    struct list_elem* e;
+    struct frame_table_entry* fte;
+    if(!list_empty(&frame_table)){
+        for(e = list_begin(&frame_table); e != list_end(&frame_table); e = list_next(e)){
+            fte = list_entry(e, struct frame_table_entry, elem_table_list);
+            if(fte->spte->accessed == false){
+                list_remove(&fte->elem);
+                pagedir_clear_page(fte->owner->pagedir, fte->spte->user_vaddr);
+                palloc_free_page(fte->frame);
+                free(fte);
+
+                return true;
+            } 
+            else{
+                fte->spte->accessed = true;
+            }
+        }
+
+        /* second chance */
+        for(e = list_begin(&frame_table); e != list_end(&frame_table); e = list_next(e)){
+            fte = list_entry(e, struct frame_table_entry, elem_table_list);
+            if(fte->spte->accessed == false){
+                list_remove(&fte->elem);
+                pagedir_clear_page(fte->owner->pagedir, fte->spte->user_vaddr);
+                palloc_free_page(fte->frame);
+                free(fte);
+
+                return true;
+            } 
+            else{
+                fte->spte->accessed = true;
+            }
+        }   
+    }
+    return false;
 }
 
 void*

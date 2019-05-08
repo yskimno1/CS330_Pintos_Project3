@@ -40,8 +40,7 @@ struct page_mmap{
 enum TYPE_FILE{
 	TYPE_SWAP = 0,
 	TYPE_MMAP = 1,
-	TYPE_STACK = 2,
-	TYPE_FILE = 3
+	TYPE_FILE = 2
 };
 
 enum palloc_type{
