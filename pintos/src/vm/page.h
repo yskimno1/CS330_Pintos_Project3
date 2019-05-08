@@ -62,4 +62,5 @@ bool setup_stack_grow(void* addr);
 bool page_handling(struct sup_page_table_entry* spt_e);
 bool swap_handling(struct sup_page_table_entry* spt_e);
 bool file_handling(struct sup_page_table_entry* spt_e);
+void evict_frame(void);
 #endif /* vm/page.h */
