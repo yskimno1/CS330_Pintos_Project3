@@ -144,7 +144,7 @@ file_handling(struct sup_page_table_entry* spt_e){
 
         return false;
     }
-
+    printf("spt e %p\n", spt_e);
     if(spt_e->read_bytes > 0){
         off_t temp = file_read_at (spt_e->file, frame, spt_e->read_bytes, spt_e->offset);
         // printf("temp : %d\n", temp);
