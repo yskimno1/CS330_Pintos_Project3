@@ -90,7 +90,7 @@ evict_frame (void){
         for(e = list_begin(&frame_table); e != list_end(&frame_table); e = list_next(e)){
             fte = list_entry(e, struct frame_table_entry, elem_table_list);
             if(fte->spte->accessed == false){
-                list_remove(&fte->elem);
+                list_remove(&fte->elem_table_list);
                 pagedir_clear_page(fte->owner->pagedir, fte->spte->user_vaddr);
                 palloc_free_page(fte->frame);
                 free(fte);
@@ -106,7 +106,7 @@ evict_frame (void){
         for(e = list_begin(&frame_table); e != list_end(&frame_table); e = list_next(e)){
             fte = list_entry(e, struct frame_table_entry, elem_table_list);
             if(fte->spte->accessed == false){
-                list_remove(&fte->elem);
+                list_remove(&fte->elem_table_list);
                 pagedir_clear_page(fte->owner->pagedir, fte->spte->user_vaddr);
                 palloc_free_page(fte->frame);
                 free(fte);
