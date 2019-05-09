@@ -172,15 +172,15 @@ process_exit (void)
   file_close(curr->main_file);  
   filelock_release();
 
-  struct list_elem* e;
-  struct list_elem* e_next;
-  e=list_begin(&curr->sup_page_table);
-  while(e != NULL){
-    e_next= list_next(e);
-    struct sup_page_table_entry* spt_e = list_entry(e, struct sup_page_table_entry, elem);
-    free(spt_e);
-    e = e_next;
-  }
+  // struct list_elem* e;
+  // struct list_elem* e_next;
+  // e=list_begin(&curr->sup_page_table);
+  // while(e != NULL){
+  //   e_next= list_next(e);
+  //   struct sup_page_table_entry* spt_e = list_entry(e, struct sup_page_table_entry, elem);
+  //   free(spt_e);
+  //   e = e_next;
+  // }
 
   /* Destroy the current process's page directory and switch back
     to the kernel-only page directory. */
