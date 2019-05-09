@@ -11,21 +11,14 @@
 void 
 swap_init (void)
 {
-    printf("swap init\n");
+
     swap_device = disk_get(1,1);
-    size_t bitmapsize = disk_size(swap_device) * DISK_SECTOR_SIZE/PGSIZE;
-    printf("bitmapsize : %d\n", bitmapsize);
-    swap_table = bitmap_create(disk_size(swap_device) * DISK_SECTOR_SIZE/PGSIZE); // kys
+
+    swap_table = bitmap_create((disk_size(swap_device)*DISK_SECTOR_SIZE)/PGSIZE); // kys
     if(swap_table == NULL) ASSERT(0);
+
     bitmap_set_all(swap_table, 0);
     lock_init(&swap_lock);
-    int size_ = bitmap_size(swap_table);
-    printf("size_ : %d\n", size_);
-    size_t temp1 = bitmap_count(swap_table, 0, bitmap_size(swap_table), 0);
-    size_t temp2 = bitmap_count(swap_table, 0, bitmap_size(swap_table), 1);
-    
-    printf("temp1 : %d\n", temp1);
-    printf("temp2, %d\n", temp2);
 }
 
 
