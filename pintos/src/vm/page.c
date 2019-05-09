@@ -77,7 +77,7 @@ allocate_page (void* addr, bool loaded, enum palloc_type p_type, uint32_t read_b
         }
     }
     else ASSERT(0);
-
+    
     spt_e->is_swapped = false;
     return spt_e;
 }
@@ -141,6 +141,7 @@ file_handling(struct sup_page_table_entry* spt_e){
 
     printf("file handling : spt e %p, file : %p\n", spt_e, spt_e->file);
     if(spt_e->read_bytes > 0){
+        printf("!11. file : %p\n", spt_e->file);
         off_t temp = file_read_at (spt_e->file, frame, spt_e->read_bytes, spt_e->offset);
         // printf("temp : %d\n", temp);
         if (temp != (int) spt_e->read_bytes){
