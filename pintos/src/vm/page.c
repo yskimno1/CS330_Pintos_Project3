@@ -117,6 +117,7 @@ page_handling(struct sup_page_table_entry* spt_e){
 
     lock_acquire(&lock_frame);
     bool success;
+
     if(spt_e->file_type == TYPE_FILE || spt_e->file_type == TYPE_MMAP) success = file_handling(spt_e);
     else if(spt_e->file_type == TYPE_SWAP) success = swap_handling(spt_e);
     lock_release(&lock_frame);
@@ -126,7 +127,7 @@ page_handling(struct sup_page_table_entry* spt_e){
 
 bool
 file_handling(struct sup_page_table_entry* spt_e){
-
+    printf("file handling! \n");
     void* frame;
     if(spt_e->read_bytes == 0) frame = allocate_frame(spt_e, PAL_USER|PAL_ZERO);
     else frame = allocate_frame(spt_e, PAL_USER);
@@ -157,6 +158,7 @@ file_handling(struct sup_page_table_entry* spt_e){
 
 bool
 swap_handling(struct sup_page_table_entry* spt_e){
+    printf("swap handling!\n");
     void* frame = allocate_frame(spt_e, PAL_USER);
     if(frame == NULL)
     // ASSERT(frame);
