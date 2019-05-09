@@ -112,7 +112,7 @@ evict_frame (void){
                 return true;
             } 
             else{
-                pagedir_set_accessed(fte->owner->pagedir, fte->spte->user_vaddr, true);
+                pagedir_set_accessed(fte->owner->pagedir, fte->spte->user_vaddr, false);
             }
         }
 
@@ -136,7 +136,7 @@ evict_frame (void){
                 return true;
             } 
             else{
-                pagedir_set_accessed(fte->owner->pagedir, fte->spte->user_vaddr, true);
+                pagedir_set_accessed(fte->owner->pagedir, fte->spte->user_vaddr, false);
             }
         }   
     }
