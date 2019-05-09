@@ -108,7 +108,9 @@ free_page(struct list_elem* e){
     struct sup_page_table_entry* spt_e = list_entry(e, struct sup_page_table_entry, elem);
     if(spt_e->loaded){
         struct thread* curr = thread_current();
+        printf("here1\n");
         free_frame(pagedir_get_page(curr->pagedir, spt_e->user_vaddr));
+        printf("here2\n");
         pagedir_clear_page(curr->pagedir, spt_e->user_vaddr);
     }
     free(spt_e);
