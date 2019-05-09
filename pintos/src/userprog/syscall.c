@@ -529,7 +529,7 @@ void munmap(int mapid){
 	// printf("unmap came!\n");
 	filelock_acquire();
 	struct list_elem* e;
-	if(!list_empty(&thread_current->list_mmap)){
+	if(!list_empty(&thread_current()->list_mmap)){
 		for(e=list_begin(&thread_current()->list_mmap); e!=list_end(&thread_current()->list_mmap); e=list_next(e)){
 			struct page_mmap* mmap_e = list_entry(e,struct page_mmap, elem_mmap);
 			if(mmap_e->spt_e->map_id == mapid){
