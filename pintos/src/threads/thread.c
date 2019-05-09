@@ -466,7 +466,7 @@ init_thread (struct thread *t, const char *name, int priority)
   t->is_loaded = false;
   t->is_exited = false;
 
-  t->map_id = 0;
+  t->map_id = 1;
 }
 
 /* Allocates a SIZE-byte frame at the top of thread T's stack and
