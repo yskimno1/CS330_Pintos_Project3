@@ -29,6 +29,9 @@ swap_init (void)
 
 disk_sector_t
 get_empty_sector_num(void){
+    printf("at 0, %d\n", bitmap_test(swap_table, 0));
+    printf("at 1, %d\n", bitmap_test(swap_table, 1));
+    
     size_t bitmap_idx = bitmap_scan_and_flip(swap_table, 0, 1, false);
     printf("bitmapidx : %d\n", bitmap_idx);
     if(bitmap_idx != BITMAP_ERROR) return bitmap_idx * PGSIZE/DISK_SECTOR_SIZE;
