@@ -400,7 +400,8 @@ load (const char *file_name, void (**eip) (void), void **esp)
   file_deny_write(file);
  done:
   /* We arrive here whether the load is successful or not. */
-  // file_close (file);
+  
+  if(success == false) file_close (file);
   free(filename_args);
   filelock_release();
   return success;
@@ -488,24 +489,19 @@ load_segment (struct file *file, off_t ofs, uint8_t *upage,
       lock_acquire(&lock_frame);
 
       struct sup_page_table_entry* spt_e = allocate_page(upage, false, LOAD_SEGMENT, page_read_bytes, page_zero_bytes, file, ofs, writable);
-      bool success = page_insert(spt_e);
-      if(success == false){
-          lock_release(&lock_frame);
-          return false;
-      }
+      if(spt_e == NULL) ASSERT(0);
       
       uint8_t* frame;
-      
       if(spt_e->read_bytes == 0) frame = allocate_frame(spt_e, PAL_USER|PAL_ZERO);
       else frame = allocate_frame(spt_e, PAL_USER);
 
-
-      success = install_page(spt_e->user_vaddr, frame, spt_e->writable);
+      bool success = install_page(spt_e->user_vaddr, frame, spt_e->writable);
       if(success == false){
           free_frame(frame);
           lock_release(&lock_frame);
           return false;
       }
+      spt_e->loaded = true;   
 
       if(spt_e->read_bytes > 0){
         off_t temp = file_read_at (spt_e->file, frame, spt_e->read_bytes, spt_e->offset);
@@ -517,23 +513,14 @@ load_segment (struct file *file, off_t ofs, uint8_t *upage,
           ASSERT(0);
           return false; 
         }
-
         memset (frame + spt_e->read_bytes, 0, spt_e->zero_bytes);
       }
 
-      spt_e->loaded = true;     
-      // struct sup_page_table_entry* spt_e;
-      // spt_e = allocate_page(upage, false, LOAD_SEGMENT, page_read_bytes, page_zero_bytes, file, ofs, writable);
-      // if(spt_e == NULL){
-      //   lock_release(&lock_frame);
-      //   return false;
-      // }
-
-      // bool success = page_insert(spt_e);
-      // if(success == false){
-      //   lock_release(&lock_frame);
-      //   return false;
-      // }
+      success = page_insert(spt_e);
+      if(success == false){
+          lock_release(&lock_frame);
+          return false;
+      }
 
       lock_release(&lock_frame);
       /* Advance. */
@@ -555,9 +542,7 @@ setup_stack (void **esp, int argc, void** argv)
   uint8_t *kpage;
   bool success = false;
 
-  // success = setup_stack_grow(((uint8_t *) PHYS_BASE) - PGSIZE);
-
-  success = setup_stack_grow(((uint8_t* )PHYS_BASE) - PGSIZE);
+  success = grow_stack(((uint8_t* )PHYS_BASE) - PGSIZE, GROW_STACK);
   if(success){
     *esp = PHYS_BASE;
     /* Implementation start */
