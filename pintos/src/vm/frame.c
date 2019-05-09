@@ -100,11 +100,11 @@ evict_frame (void){
                 if(pagedir_is_dirty(fte->owner->pagedir, fte->spte->user_vaddr) || fte->spte->file_type == TYPE_SWAP){
                     fte->spte->file_type = TYPE_SWAP;
                     fte->spte->swap_num = swap_out(fte->frame);
-                    printf("swap num : %d\n", fte->spte->swap_num);
+                    // printf("swap num : %d\n", fte->spte->swap_num);
                 }
                 list_remove(&fte->elem_table_list);
                 pagedir_clear_page(fte->owner->pagedir, fte->spte->user_vaddr);
-                printf("frame which evicted : %p\n", fte->frame);
+                // printf("frame which evicted : %p\n", fte->frame);
                 palloc_free_page(fte->frame);
                 
                 fte->spte->loaded = false;

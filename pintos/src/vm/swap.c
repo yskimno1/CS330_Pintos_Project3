@@ -26,8 +26,8 @@ disk_sector_t
 get_empty_sector_num(void){
 
     size_t bitmap_idx = bitmap_scan_and_flip(swap_table, 0, 1, 0);
-    printf("bitmapidx : %d\n", bitmap_idx);
-    if(bitmap_idx != BITMAP_ERROR) return bitmap_idx * PGSIZE/DISK_SECTOR_SIZE;
+    // printf("bitmapidx : %d\n", bitmap_idx);
+    if(bitmap_idx != BITMAP_ERROR) return (bitmap_idx * PGSIZE)/DISK_SECTOR_SIZE;
     else{
         PANIC("bitmap full");
     }
@@ -50,9 +50,9 @@ get_empty_sector_num(void){
 bool 
 swap_in (void *frame_addr, disk_sector_t sector_num)
 { 
-    printf("swap in\n");
+    // printf("swap in\n");
     lock_acquire(&swap_lock);
-    disk_sector_t bitmap_idx = sector_num * DISK_SECTOR_SIZE/PGSIZE;
+    disk_sector_t bitmap_idx = (sector_num * DISK_SECTOR_SIZE)/PGSIZE;
     bool success = bitmap_test(swap_table, bitmap_idx);
     if(success == false) PANIC("invalid swap space!");
 
@@ -81,7 +81,7 @@ swap_in (void *frame_addr, disk_sector_t sector_num)
 disk_sector_t
 swap_out (void* frame_addr)
 {
-    printf("swap out\n");
+    // printf("swap out\n");
     lock_acquire(&swap_lock);
     void* addr =pg_round_down(frame_addr);
 
