@@ -499,7 +499,7 @@ int mmap(int fd, void* addr){ //needs lazy loading
 				lock_release(&lock_frame);
 				return false;
 			}
-
+			printf("map id in thrad : %d\n", thread_current()->map_id);
 			mmap_e->spt_e->map_id = thread_current()->map_id;
 			mmap_e->spt_e = spt_e;
 			list_push_back(&thread_current()->list_mmap, &mmap_e->elem_mmap);
