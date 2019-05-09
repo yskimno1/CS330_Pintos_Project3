@@ -512,6 +512,7 @@ load_segment (struct file *file, off_t ofs, uint8_t *upage,
 
       lock_acquire(&lock_frame);
 
+      printf("file : %p\n", file);
       struct sup_page_table_entry* spt_e = allocate_page(upage, false, LOAD_SEGMENT, page_read_bytes, page_zero_bytes, file, ofs, writable);
       if(spt_e == NULL) ASSERT(0);
 
