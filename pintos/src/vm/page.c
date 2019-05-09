@@ -78,6 +78,7 @@ allocate_page (void* addr, bool loaded, enum palloc_type p_type, uint32_t read_b
     }
     else ASSERT(0);
 
+    spt_e->is_swapped = false;
     return spt_e;
 }
 
@@ -134,12 +135,6 @@ file_handling(struct sup_page_table_entry* spt_e){
     else frame = allocate_frame(spt_e, PAL_USER);
     if(frame == NULL) return false;
 
-    bool success = install_page(spt_e->user_vaddr, frame, spt_e->writable);
-
-    if(success == false){
-        free_frame(frame);
-        return false;
-    }
     // printf("spt e %p\n", spt_e);
     if(spt_e->read_bytes > 0){
         off_t temp = file_read_at (spt_e->file, frame, spt_e->read_bytes, spt_e->offset);
@@ -152,6 +147,13 @@ file_handling(struct sup_page_table_entry* spt_e){
         }
         memset (frame + spt_e->read_bytes, 0, spt_e->zero_bytes);
     }
+    bool success = install_page(spt_e->user_vaddr, frame, spt_e->writable);
+
+    if(success == false){
+        free_frame(frame);
+        return false;
+    }
+
     spt_e->loaded = true;
 
     return true;
@@ -159,9 +161,7 @@ file_handling(struct sup_page_table_entry* spt_e){
 
 bool
 swap_handling(struct sup_page_table_entry* spt_e){
-    // printf("swap handling!\n");
     void* frame = allocate_frame(spt_e, PAL_USER);
-    // ASSERT(frame);
     if(frame == NULL){
         return false;
     }
@@ -170,7 +170,7 @@ swap_handling(struct sup_page_table_entry* spt_e){
         free_frame(frame);
         return false;
     }
-    swap_in(frame, spt_e->swap_num);
+    if(spt_e->is_swapped) swap_in(frame, spt_e->swap_num);
     spt_e->loaded = true;
     return true;
 }
@@ -182,11 +182,11 @@ grow_stack(void* addr, enum palloc_type ptype){
     struct sup_page_table_entry* spt_e;
     uint8_t* frame_addr;
     if(ptype == PAGE_FAULT){
-        spt_e = allocate_page(page_addr, true, PAGE_FAULT, 0, 0, NULL, 0, 0);
+        spt_e = allocate_page(page_addr, true, PAGE_FAULT, 0, 0, NULL, 0, 1); // already loaded
         frame_addr = allocate_frame(spt_e, PAL_USER);
     }
     else if(ptype == GROW_STACK){
-        spt_e = allocate_page(addr, false, GROW_STACK, 0, 0, NULL, 0, 1);
+        spt_e = allocate_page(addr, true, GROW_STACK, 0, 0, NULL, 0, 1);
         frame_addr = allocate_frame(spt_e, PAL_USER|PAL_ZERO);
     }
     if(frame_addr==NULL){

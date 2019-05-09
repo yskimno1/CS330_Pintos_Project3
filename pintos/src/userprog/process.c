@@ -512,31 +512,6 @@ load_segment (struct file *file, off_t ofs, uint8_t *upage,
 
       struct sup_page_table_entry* spt_e = allocate_page(upage, false, LOAD_SEGMENT, page_read_bytes, page_zero_bytes, file, ofs, writable);
       if(spt_e == NULL) ASSERT(0);
-      
-      // uint8_t* frame;
-      // if(spt_e->read_bytes == 0) frame = allocate_frame(spt_e, PAL_USER|PAL_ZERO);
-      // else frame = allocate_frame(spt_e, PAL_USER);
-
-      // bool success = install_page(spt_e->user_vaddr, frame, spt_e->writable);
-      // if(success == false){
-      //     free_frame(frame);
-      //     lock_release(&lock_frame);
-      //     return false;
-      // }
-      // spt_e->loaded = true;   
-
-      // if(spt_e->read_bytes > 0){
-      //   off_t temp = file_read_at (spt_e->file, frame, spt_e->read_bytes, spt_e->offset);
-      //   // printf("temp : %d\n", temp);
-      //   if (temp != (int) spt_e->read_bytes){
-      //     // printf("%d vs %d\n", temp, (int) spt_e->read_bytes);
-      //     free_frame(frame);
-      //     lock_release(&lock_frame);
-      //     ASSERT(0);
-      //     return false; 
-      //   }
-      //   memset (frame + spt_e->read_bytes, 0, spt_e->zero_bytes);
-      // }
 
       bool success = page_insert(spt_e);
       if(success == false){
