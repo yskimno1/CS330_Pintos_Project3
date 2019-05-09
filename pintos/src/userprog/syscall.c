@@ -506,7 +506,7 @@ int mmap(int fd, void* addr){ //needs lazy loading
 
 			bool success = page_insert(spt_e);
 			if(success == false){
-				// printf("need to unmap!\n");
+				printf("need to unmap!\n");
 				list_remove(&mmap_e->elem_mmap);
 				thread_current()->map_id -= 1;
 				lock_release(&lock_frame);
@@ -521,6 +521,7 @@ int mmap(int fd, void* addr){ //needs lazy loading
 		zero_bytes -= page_zero_bytes;
 		offset += page_read_bytes;
 	}
+	printf("map_id in thread_current : %d\n", thread_current()->map_id);
 	thread_current()->map_id += 1;
 	return thread_current()->map_id -1;
 }
@@ -532,7 +533,7 @@ void munmap(int mapid){
 	if(!list_empty(&thread_current()->list_mmap)){
 		for(e=list_begin(&thread_current()->list_mmap); e!=list_end(&thread_current()->list_mmap); e=list_next(e)){
 			struct page_mmap* mmap_e = list_entry(e,struct page_mmap, elem_mmap);
-			printf("map_id : %d\n, mapid : %d\n", mmap_e->spt_e->map_id, mapid);
+			printf("map_id : %d, mapid : %d\n", mmap_e->spt_e->map_id, mapid);
 			if(mmap_e->spt_e->map_id == mapid){
 				printf("begin! map id : %d, addr %p\n", mapid, mmap_e->spt_e);
 				if(pagedir_is_dirty(thread_current()->pagedir, mmap_e->spt_e->user_vaddr)){
