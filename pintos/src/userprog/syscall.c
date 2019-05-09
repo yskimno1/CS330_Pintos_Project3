@@ -520,7 +520,7 @@ int mmap(int fd, void* addr){ //needs lazy loading
 		}
 		else{
 			// spt_e exists, so load
-			file_handling(mmap_e->spt_e);
+			file_handling(spt_e);
 		}
 		/* do we need to check other mmaps? */
 		read_bytes -= page_read_bytes;
