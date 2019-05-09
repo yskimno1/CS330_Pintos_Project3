@@ -256,7 +256,6 @@ void
 check_page(void* buffer, unsigned size, void* esp){
 	void* ptr = buffer;
 	for(;ptr<buffer+size; ptr++){
-		printf("111\n");
 		if (is_bad_pointer(ptr)){
 			// printf("came!\n");
 			struct sup_page_table_entry* spt_e = find_page(ptr);
@@ -322,7 +321,7 @@ int create (const char *file, unsigned initial_size){
     return 0;
 	}
 	check_page(buffer, size, esp);
-	
+
 	return filesys_create(file, initial_size);
 }
 
