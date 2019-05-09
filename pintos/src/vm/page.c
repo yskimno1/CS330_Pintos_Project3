@@ -159,7 +159,7 @@ file_handling(struct sup_page_table_entry* spt_e){
 
 bool
 swap_handling(struct sup_page_table_entry* spt_e){
-    printf("swap handling!\n");
+    // printf("swap handling!\n");
     void* frame = allocate_frame(spt_e, PAL_USER);
     // ASSERT(frame);
     if(frame == NULL){
