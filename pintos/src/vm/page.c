@@ -160,7 +160,6 @@ bool
 swap_handling(struct sup_page_table_entry* spt_e){
     printf("swap handling!\n");
     void* frame = allocate_frame(spt_e, PAL_USER);
-    if(frame == NULL)
     // ASSERT(frame);
     if(frame == NULL){
         return false;
