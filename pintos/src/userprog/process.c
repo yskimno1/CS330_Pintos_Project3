@@ -172,8 +172,9 @@ process_exit (void)
   file_close(curr->main_file);  
   filelock_release();
 
-  while(!list_empty(&curr->sup_page_table)){
+  while(!list_empty(&curr->sup_page_table)){ 
     struct list_elem* e = list_pop_front(&curr->sup_page_table);
+    /* need to change bitmap, too.. */
     free_page(e);  
   }
 
