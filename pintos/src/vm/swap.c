@@ -29,8 +29,7 @@ swap_init (void)
 
 disk_sector_t
 get_empty_sector_num(void){
-    printf("at 0, %d\n", bitmap_test(swap_table, 0));
-    printf("at 1, %d\n", bitmap_test(swap_table, 1));
+    printf("at 0, %d\n", swap_table->bit_cnt);
     
     size_t bitmap_idx = bitmap_scan_and_flip(swap_table, 0, 1, false);
     printf("bitmapidx : %d\n", bitmap_idx);
@@ -90,6 +89,7 @@ swap_out (void* frame_addr)
 {
     lock_acquire(&swap_lock);
     void* addr =pg_round_down(frame_addr);
+
     disk_sector_t sector_num = get_empty_sector_num();
     write_to_disk(frame_addr, sector_num);
 
