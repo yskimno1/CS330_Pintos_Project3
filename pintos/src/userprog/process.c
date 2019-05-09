@@ -416,7 +416,6 @@ load (const char *file_name, void (**eip) (void), void **esp)
     goto done;
 
   /* Start address. */
-  printf("file in process : %p\n", file);
   thread_current()->main_file = file;
   *eip = (void (*) (void)) ehdr.e_entry;
 
