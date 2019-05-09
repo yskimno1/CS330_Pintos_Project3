@@ -6,6 +6,7 @@
 #include "userprog/pagedir.h"
 #include "vm/page.h"
 #include "vm/frame.h"
+#include "vm/swap.h"
 /*
  * Initialize frame table
  */
@@ -49,15 +50,13 @@ allocate_frame (struct sup_page_table_entry* spt_e, enum palloc_flags flag)
     ASSERT(flag & PAL_USER);
 
     uint8_t* frame = palloc_get_page(flag);
-    printf("palloc done\n");
+
     if(frame == NULL){
         /* need to evict */
-        printf("eviction start\n");
         bool eviction_success = evict_frame();
-        printf("eviction end");
         if(eviction_success){
-            printf("eviction success\n");
             frame = palloc_get_page(flag);
+            printf("frame : %p\n", frame);
         }
         else ASSERT(0);
     }
@@ -96,9 +95,17 @@ evict_frame (void){
         for(e = list_begin(&frame_table); e != list_end(&frame_table); e = list_next(e)){
             fte = list_entry(e, struct frame_table_entry, elem_table_list);
             if(fte->spte->accessed == false){
+                if(fte->spte->file_type == TYPE_SWAP){
+                    fte->spte->swap_num = swap_out(fte->frame);
+                }
+
+
                 list_remove(&fte->elem_table_list);
                 pagedir_clear_page(fte->owner->pagedir, fte->spte->user_vaddr);
+                printf("frame in evict : %p\n", fte->frame);
                 palloc_free_page(fte->frame);
+                
+                fte->spte->loaded = false;
                 free(fte);
 
                 return true;
