@@ -100,6 +100,8 @@ struct thread
     struct file* fdt[FILE_MAX];              /* file descriptor table, max 128*/
     int fd_vld;                         /* vaild descriptor number for next open(fdt[fd_vld] == NULL) */
 
+    struct file* main_file;
+
     struct semaphore sema_load;
     struct semaphore sema_wait;
     struct semaphore sema_exited;

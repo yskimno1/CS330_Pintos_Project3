@@ -161,10 +161,26 @@ process_exit (void)
 
   curr->is_exited = true;
   sema_up(&curr->sema_wait);
-
   /* wait until parent removes the child in the list */
   sema_down(&curr->sema_exited);
 
+  filelock_acquire();
+  int i;
+  for(i=0; i<FILE_MAX; i++){
+    file_close(curr->fdt[i]);
+  }
+  file_close(curr->main_file);  
+  filelock_release();
+
+  struct list_elem* e;
+  struct list_elem* e_next;
+  e=list_begin(&curr->sup_page_table);
+  while(e != NULL){
+    e_next= list_next(e);
+    struct sup_page_table_entry* spt_e = list_entry(e, struct sup_page_table_entry, elem);
+    free(spt_e);
+    e = e_next;
+  }
 
   /* Destroy the current process's page directory and switch back
     to the kernel-only page directory. */
@@ -394,6 +410,7 @@ load (const char *file_name, void (**eip) (void), void **esp)
     goto done;
 
   /* Start address. */
+  &thread_current()->main_file = file;
   *eip = (void (*) (void)) ehdr.e_entry;
 
   success = true;
@@ -491,32 +508,32 @@ load_segment (struct file *file, off_t ofs, uint8_t *upage,
       struct sup_page_table_entry* spt_e = allocate_page(upage, false, LOAD_SEGMENT, page_read_bytes, page_zero_bytes, file, ofs, writable);
       if(spt_e == NULL) ASSERT(0);
       
-      uint8_t* frame;
-      if(spt_e->read_bytes == 0) frame = allocate_frame(spt_e, PAL_USER|PAL_ZERO);
-      else frame = allocate_frame(spt_e, PAL_USER);
+      // uint8_t* frame;
+      // if(spt_e->read_bytes == 0) frame = allocate_frame(spt_e, PAL_USER|PAL_ZERO);
+      // else frame = allocate_frame(spt_e, PAL_USER);
 
-      bool success = install_page(spt_e->user_vaddr, frame, spt_e->writable);
-      if(success == false){
-          free_frame(frame);
-          lock_release(&lock_frame);
-          return false;
-      }
-      spt_e->loaded = true;   
+      // bool success = install_page(spt_e->user_vaddr, frame, spt_e->writable);
+      // if(success == false){
+      //     free_frame(frame);
+      //     lock_release(&lock_frame);
+      //     return false;
+      // }
+      // spt_e->loaded = true;   
 
-      if(spt_e->read_bytes > 0){
-        off_t temp = file_read_at (spt_e->file, frame, spt_e->read_bytes, spt_e->offset);
-        // printf("temp : %d\n", temp);
-        if (temp != (int) spt_e->read_bytes){
-          // printf("%d vs %d\n", temp, (int) spt_e->read_bytes);
-          free_frame(frame);
-          lock_release(&lock_frame);
-          ASSERT(0);
-          return false; 
-        }
-        memset (frame + spt_e->read_bytes, 0, spt_e->zero_bytes);
-      }
+      // if(spt_e->read_bytes > 0){
+      //   off_t temp = file_read_at (spt_e->file, frame, spt_e->read_bytes, spt_e->offset);
+      //   // printf("temp : %d\n", temp);
+      //   if (temp != (int) spt_e->read_bytes){
+      //     // printf("%d vs %d\n", temp, (int) spt_e->read_bytes);
+      //     free_frame(frame);
+      //     lock_release(&lock_frame);
+      //     ASSERT(0);
+      //     return false; 
+      //   }
+      //   memset (frame + spt_e->read_bytes, 0, spt_e->zero_bytes);
+      // }
 
-      success = page_insert(spt_e);
+      bool success = page_insert(spt_e);
       if(success == false){
           lock_release(&lock_frame);
           return false;
