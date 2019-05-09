@@ -256,6 +256,7 @@ void
 check_page(void* buffer, unsigned size, void* esp){
 	void* ptr = buffer;
 	for(;ptr<buffer+size; ptr++){
+		printf("ptr : %p, %p + %d\n", ptr, buffer, size);
 		if (is_bad_pointer(ptr)){
 			// printf("came!\n");
 			struct sup_page_table_entry* spt_e = find_page(ptr);
