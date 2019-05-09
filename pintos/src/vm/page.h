@@ -38,7 +38,7 @@ struct page_mmap{
     struct list_elem elem_mmap;
 };
 
-enum TYPE_FILE{
+enum TYPE_FILE{ // change name //
 	TYPE_SWAP = 0,
 	TYPE_MMAP = 1,
 	TYPE_FILE = 2

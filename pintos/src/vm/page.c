@@ -5,6 +5,7 @@
 #include <stddef.h>
 #include "threads/thread.h"
 #include "vm/frame.h"
+#include "vm/swap.h"
 #include "userprog/pagedir.h"
 #include "threads/vaddr.h"
 #include "userprog/process.h"
@@ -169,6 +170,7 @@ swap_handling(struct sup_page_table_entry* spt_e){
         free_frame(frame);
         return false;
     }
+    swap_in(frame, spt_e->swap_num);
     spt_e->loaded = true;
     return true;
 }
