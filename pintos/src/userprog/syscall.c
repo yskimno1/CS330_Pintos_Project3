@@ -520,7 +520,7 @@ int mmap(int fd, void* addr){ //needs lazy loading
 		zero_bytes -= page_zero_bytes;
 		offset += page_read_bytes;
 	}
-
+	thread_current()->map_id += 1;
 	return thread_current()->map_id -1;
 }
 
