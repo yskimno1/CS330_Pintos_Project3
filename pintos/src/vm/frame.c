@@ -49,10 +49,16 @@ allocate_frame (struct sup_page_table_entry* spt_e, enum palloc_flags flag)
     ASSERT(flag & PAL_USER);
 
     uint8_t* frame = palloc_get_page(flag);
+    printf("palloc done\n");
     if(frame == NULL){
         /* need to evict */
+        printf("eviction start\n");
         bool eviction_success = evict_frame();
-        if(eviction_success) frame = palloc_get_page(flag);
+        printf("eviction end");
+        if(eviction_success){
+            printf("eviction success\n");
+            frame = palloc_get_page(flag);
+        }
         else ASSERT(0);
     }
     // if(frame == NULL) PANIC("frame is full");
