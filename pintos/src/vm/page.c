@@ -139,7 +139,7 @@ file_handling(struct sup_page_table_entry* spt_e){
     else frame = allocate_frame(spt_e, PAL_USER);
     if(frame == NULL) return false;
 
-    // printf("spt e %p\n", spt_e);
+    printf("file handling : spt e %p, file : %p\n", spt_e, spt_e->file);
     if(spt_e->read_bytes > 0){
         off_t temp = file_read_at (spt_e->file, frame, spt_e->read_bytes, spt_e->offset);
         // printf("temp : %d\n", temp);
