@@ -158,6 +158,23 @@ process_exit (void)
 {
   struct thread *curr = thread_current ();
   uint32_t *pd;
+  /* unmap all */
+  if(!list_empty(&thread_current->list_mmap)){
+		for(e=list_begin(&thread_current()->list_mmap); e!=list_end(&thread_current()->list_mmap); e=list_next(e)){
+			struct page_mmap* mmap_e = list_entry(e,struct page_mmap, elem_mmap);
+      if(pagedir_is_dirty(thread_current()->pagedir, mmap_e->spt_e->user_vaddr)){
+        file_write_at(mmap_e->spt_e->file, mmap_e->spt_e->user_vaddr, mmap_e->spt_e->read_bytes, mmap_e->spt_e->offset);
+        free_frame(pagedir_get_page(thread_current()->pagedir, mmap_e->spt_e->user_vaddr));
+        free_page(mmap_e->spt_e->elem);
+        list_remove(e);
+      }
+      else{
+        free_frame(pagedir_get_page(thread_current()->pagedir, mmap_e->spt_e->user_vaddr));
+        free_page(mmap_e->spt_e->elem);
+        list_remove(e);
+      }
+    }
+	}
 
   curr->is_exited = true;
   sema_up(&curr->sema_wait);
