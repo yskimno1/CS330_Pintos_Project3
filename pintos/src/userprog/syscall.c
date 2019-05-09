@@ -28,7 +28,7 @@ static uint32_t* p_argv(void* addr);
 static void halt (void);
 static pid_t exec (const char *file);
 static int wait (pid_t pid);
-static int create (const char *file, unsigned initial_size);
+static int create (const char *file, unsigned initial_size, void* esp);
 static int remove (const char *file);
 static int open (const char *file);
 static int filesize (int fd);
@@ -128,7 +128,7 @@ syscall_handler (struct intr_frame *f)
       argv1 = *p_argv(if_esp+8);
 
 			filelock_acquire();
-			int result = create((const char*)argv0, (unsigned)argv1);
+			int result = create((const char*)argv0, (unsigned)argv1, if_esp);
 			filelock_release();
 			if(result == -1){
 				exit(-1);
@@ -311,7 +311,7 @@ int wait (pid_t pid){
 	return process_wait(pid);
 }
 
-int create (const char *file, unsigned initial_size){
+int create (const char *file, unsigned initial_size, void* esp){
 
   if (!string_validate(file)){
     return -1;
@@ -320,7 +320,7 @@ int create (const char *file, unsigned initial_size){
   if (strlen(file)>14){
     return 0;
 	}
-	check_page(buffer, size, esp);
+	check_page(file, initial_size, esp);
 
 	return filesys_create(file, initial_size);
 }
