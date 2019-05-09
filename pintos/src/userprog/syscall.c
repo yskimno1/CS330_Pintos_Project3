@@ -531,9 +531,9 @@ void munmap(int mapid){
 	if(!list_empty(&thread_current()->list_mmap)){
 		for(e=list_begin(&thread_current()->list_mmap); e!=list_end(&thread_current()->list_mmap); e=list_next(e)){
 			struct page_mmap* mmap_e = list_entry(e,struct page_mmap, elem_mmap);
-			// printf("map_id : %d\n, mapid : %d\n", mmap_e->spt_e->map_id, mapid);
+			printf("map_id : %d\n, mapid : %d\n", mmap_e->spt_e->map_id, mapid);
 			if(mmap_e->spt_e->map_id == mapid){
-				// printf("begin! map id : %d, addr %p\n", mapid, mmap_e->spt_e);
+				printf("begin! map id : %d, addr %p\n", mapid, mmap_e->spt_e);
 				if(pagedir_is_dirty(thread_current()->pagedir, mmap_e->spt_e->user_vaddr)){
 					file_write_at(mmap_e->spt_e->file, mmap_e->spt_e->user_vaddr, mmap_e->spt_e->read_bytes, mmap_e->spt_e->offset);
 					free_frame(pagedir_get_page(thread_current()->pagedir, mmap_e->spt_e->user_vaddr));
