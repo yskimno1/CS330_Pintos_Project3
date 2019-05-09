@@ -259,8 +259,8 @@ check_page(void* buffer, unsigned size, void* esp){
 			// printf("came!\n");
 			struct sup_page_table_entry* spt_e = find_page(ptr);
 			if(spt_e != NULL){
-				printf("need to load page in syscall.read!\n");
-				ASSERT(0);
+				bool success = page_handling(spt_e);
+				if(success == false) ASSERT(0);
 			}
 			if(ptr >= esp - 32){
 				// printf("grow stack at pointer %p!\n", ptr);
@@ -458,7 +458,7 @@ void close (int fd){
 	filelock_release();
 }
 
-int mmap(int fd, void* addr){ // needs lazy loading
+int mmap(int fd, void* addr){ //needs lazy loading
 
 	struct thread* curr = thread_current();
 	struct file* f = curr->fdt[fd];
@@ -500,7 +500,7 @@ int mmap(int fd, void* addr){ // needs lazy loading
 
 			bool success = page_insert(spt_e);
 			if(success == false){
-				printf("need to unmap!\n");
+				// printf("need to unmap!\n");
 				list_remove(&mmap_e->elem_mmap);
 				thread_current()->map_id -= 1;
 				lock_release(&lock_frame);
@@ -521,7 +521,7 @@ int mmap(int fd, void* addr){ // needs lazy loading
 }
 
 void munmap(int mapid){
-	printf("unmap came!\n");
+	// printf("unmap came!\n");
 
 
 

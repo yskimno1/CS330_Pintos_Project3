@@ -120,7 +120,11 @@ page_handling(struct sup_page_table_entry* spt_e){
     lock_acquire(&lock_frame);
     bool success;
 
-    if(spt_e->file_type == TYPE_FILE || spt_e->file_type == TYPE_MMAP) success = file_handling(spt_e);
+    if(spt_e->file_type == TYPE_FILE){
+        if(spt_e->loaded == true) success = swap_handling(spt_e);
+        else success = file_handling(spt_e);
+    }
+    else if(spt_e->file_type == TYPE_MMAP) success = file_handling(spt_e);
     else if(spt_e->file_type == TYPE_SWAP) success = swap_handling(spt_e);
     lock_release(&lock_frame);
 
@@ -140,7 +144,6 @@ file_handling(struct sup_page_table_entry* spt_e){
         off_t temp = file_read_at (spt_e->file, frame, spt_e->read_bytes, spt_e->offset);
         // printf("temp : %d\n", temp);
         if (temp != (int) spt_e->read_bytes){
-            printf("%d vs %d\n", temp, (int) spt_e->read_bytes);
             free_frame(frame);
             ASSERT(0);
             return false; 
@@ -171,6 +174,7 @@ swap_handling(struct sup_page_table_entry* spt_e){
         return false;
     }
     if(spt_e->is_swapped) swap_in(frame, spt_e->swap_num);
+    spt_e->is_swapped = false;
     spt_e->loaded = true;
     return true;
 }

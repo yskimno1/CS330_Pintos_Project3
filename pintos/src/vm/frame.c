@@ -52,11 +52,9 @@ allocate_frame (struct sup_page_table_entry* spt_e, enum palloc_flags flag)
     uint8_t* frame = palloc_get_page(flag);
 
     if(frame == NULL){
-        /* need to evict */
         bool eviction_success = evict_frame();
         if(eviction_success){
             frame = palloc_get_page(flag);
-            // printf("frame : %p\n", frame);
         }
         else ASSERT(0);
     }
