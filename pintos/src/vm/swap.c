@@ -15,11 +15,11 @@ swap_init (void)
     swap_device = disk_get(1,1);
     swap_table = bitmap_create(DISK_SECTOR_SIZE/PGSIZE * disk_size(swap_device)); // kys
     if(swap_table == NULL) ASSERT(0);
-    bitmap_set_all(swap_table, false);
+    bitmap_set_all(swap_table, 0);
     lock_init(&swap_lock);
 
     printf("temp\n");
-    disk_sector_t secnum = bitmap_scan_and_flip(swap_table, 0, 1, false);
+    disk_sector_t secnum = bitmap_scan_and_flip(swap_table, 0, 1, 0);
     printf("temp2, %d\n", secnum);
 }
 
@@ -27,7 +27,7 @@ swap_init (void)
 disk_sector_t
 get_empty_sector_num(void){
 
-    size_t bitmap_idx = bitmap_scan_and_flip(swap_table, 0, 1, false);
+    size_t bitmap_idx = bitmap_scan_and_flip(swap_table, 0, 1, 0);
     printf("bitmapidx : %d\n", bitmap_idx);
     if(bitmap_idx != BITMAP_ERROR) return bitmap_idx * PGSIZE/DISK_SECTOR_SIZE;
     else{
