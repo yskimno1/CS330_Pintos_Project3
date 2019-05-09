@@ -13,6 +13,8 @@ swap_init (void)
 {
     printf("swap init\n");
     swap_device = disk_get(1,1);
+    int size_ = disk_size(swap_device);
+    printf("size_ : %d\n", size_);
     swap_table = bitmap_create(DISK_SECTOR_SIZE/PGSIZE * disk_size(swap_device)); // kys
     if(swap_table == NULL) ASSERT(0);
     bitmap_set_all(swap_table, 0);
