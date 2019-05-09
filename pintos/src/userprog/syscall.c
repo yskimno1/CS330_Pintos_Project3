@@ -467,7 +467,7 @@ int mmap(int fd, void* addr){ //needs lazy loading
 
 	struct thread* curr = thread_current();
 	struct file* f = curr->fdt[fd];
-	if(f == NULL){
+	if(f == NULL || fd==1 || fd==0){
 		return -1;
 	}
 
@@ -533,6 +533,7 @@ void munmap(int mapid){
 		for(e=list_begin(&thread_current()->list_mmap); e!=list_end(&thread_current()->list_mmap); e=list_next(e)){
 			struct page_mmap* mmap_e = list_entry(e,struct page_mmap, elem_mmap);
 			if(mmap_e->spt_e->map_id == mapid){
+				printf("map id : %d, addr %p\n", mapid, mmap_e->spt_e);
 				if(pagedir_is_dirty(thread_current()->pagedir, mmap_e->spt_e->user_vaddr)){
 					file_write_at(mmap_e->spt_e->file, mmap_e->spt_e->user_vaddr, mmap_e->spt_e->read_bytes, mmap_e->spt_e->offset);
 					free_frame(pagedir_get_page(thread_current()->pagedir, mmap_e->spt_e->user_vaddr));
