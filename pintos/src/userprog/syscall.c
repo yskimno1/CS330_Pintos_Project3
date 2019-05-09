@@ -265,7 +265,7 @@ check_page(void* buffer, unsigned size, void* esp){
 			if(ptr >= esp - 32){
 				// printf("grow stack at pointer %p!\n", ptr);
 				lock_acquire(&lock_frame);
-				bool success = grow_stack(ptr);
+				bool success = grow_stack(ptr, PAGE_FAULT);
 				lock_release(&lock_frame);
 				if(success == false){
 
