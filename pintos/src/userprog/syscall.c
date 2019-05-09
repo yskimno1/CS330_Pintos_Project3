@@ -126,7 +126,7 @@ syscall_handler (struct intr_frame *f)
   	case SYS_CREATE:	/* Create a file. */
   		argv0 = *p_argv(if_esp+4);
       argv1 = *p_argv(if_esp+8);
-
+			printf("come to create\n")
 			filelock_acquire();
 			int result = create((const char*)argv0, (unsigned)argv1, if_esp);
 			filelock_release();
@@ -256,7 +256,7 @@ void
 check_page(void* buffer, unsigned size, void* esp){
 	void* ptr = buffer;
 	for(;ptr<buffer+size; ptr++){
-		printf("ptr : %p, %p + %d\n", ptr, buffer, size);
+		// printf("ptr : %p, %p + %d\n", ptr, buffer, size);
 		if (is_bad_pointer(ptr)){
 			// printf("came!\n");
 			struct sup_page_table_entry* spt_e = find_page(ptr);
