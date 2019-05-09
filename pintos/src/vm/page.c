@@ -128,20 +128,14 @@ bool
 file_handling(struct sup_page_table_entry* spt_e){
 
     void* frame;
-
     if(spt_e->read_bytes == 0) frame = allocate_frame(spt_e, PAL_USER|PAL_ZERO);
     else frame = allocate_frame(spt_e, PAL_USER);
-    // ASSERT(frame);
-    if(frame == NULL){
-
-        return false;
-    }
+    if(frame == NULL) return false;
 
     bool success = install_page(spt_e->user_vaddr, frame, spt_e->writable);
 
     if(success == false){
         free_frame(frame);
-
         return false;
     }
     // printf("spt e %p\n", spt_e);
@@ -151,14 +145,11 @@ file_handling(struct sup_page_table_entry* spt_e){
         if (temp != (int) spt_e->read_bytes){
             printf("%d vs %d\n", temp, (int) spt_e->read_bytes);
             free_frame(frame);
-
             ASSERT(0);
             return false; 
         }
-
         memset (frame + spt_e->read_bytes, 0, spt_e->zero_bytes);
     }
-
     spt_e->loaded = true;
 
     return true;
@@ -177,20 +168,24 @@ swap_handling(struct sup_page_table_entry* spt_e){
         free_frame(frame);
         return false;
     }
-
-
-
-    return false;
+    spt_e->loaded = true;
+    return true;
 }
 
 bool
-grow_stack(void* addr){
+grow_stack(void* addr, enum palloc_type ptype){
 
     void* page_addr = pg_round_down(addr);
-
-    struct sup_page_table_entry* spt_e = allocate_page(page_addr, true, PAGE_FAULT, 0, 0, NULL, 0, 0);
-
-    uint8_t* frame_addr = allocate_frame(spt_e, PAL_USER);
+    struct sup_page_table_entry* spt_e;
+    uint8_t* frame_addr;
+    if(ptype == PAGE_FAULT){
+        spt_e = allocate_page(page_addr, true, PAGE_FAULT, 0, 0, NULL, 0, 0);
+        frame_addr = allocate_frame(spt_e, PAL_USER);
+    }
+    else if(ptype == GROW_STACK){
+        spt_e = allocate_page(addr, false, GROW_STACK, 0, 0, NULL, 0, 1);
+        frame_addr = allocate_frame(spt_e, PAL_USER|PAL_ZERO);
+    }
     if(frame_addr==NULL){
         printf("frame null\n");
         free(spt_e);
@@ -205,38 +200,5 @@ grow_stack(void* addr){
         return false;
     }
     success = page_insert(spt_e);
-    // printf("inserted : %p\n", spt_e->user_vaddr);
     return success;
-}
-
-bool
-setup_stack_grow(void* addr){
-
-    struct sup_page_table_entry* spt_e = allocate_page(addr, false, GROW_STACK, 0, 0, NULL, 0, 1);
-    if(spt_e==NULL){
-        printf("spte null\n");
-        return false;
-    }
-
-    uint8_t* frame_addr = allocate_frame(spt_e, PAL_USER|PAL_ZERO);
-    if(frame_addr==NULL){
-        printf("frame null\n");
-        free(spt_e);
-        return false;
-    }
-    spt_e->loaded = true;
-    bool success = page_insert(spt_e); // can insert at front kys
-    ASSERT(success);
-    // printf("inserted : %p\n", spt_e->user_vaddr);
-
-    success = install_page(addr, frame_addr, spt_e->writable);
-
-    if(success == false){
-        printf("install page failed\n");
-        free_frame(frame_addr);
-        free(spt_e);
-        return false;
-    }
-
-    return true;
 }
