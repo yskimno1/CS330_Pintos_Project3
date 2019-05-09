@@ -314,12 +314,14 @@ int wait (pid_t pid){
 int create (const char *file, unsigned initial_size, void* esp){
 
   if (!string_validate(file)){
-    return -1;
+		filelock_release();
+    exit(-1);
   }
 
   if (strlen(file)>14){
     return 0;
 	}
+	printf("111\n");
 	check_page(file, initial_size, esp);
 
 	return filesys_create(file, initial_size);
@@ -377,7 +379,7 @@ int read (int fd, void *buffer, unsigned size, void* esp){
 		exit(-1);
     return -1;
 	}
-
+	printf("222\n");
 	check_page(buffer, size, esp);
 
 	if (fd == 0){			//keyboard input
@@ -413,6 +415,7 @@ int write (int fd, const void *buffer, unsigned size, void* esp){
 		exit(-1);
     return cnt;
 	}
+	printf("333\n");
 	check_page(buffer, size, esp);
 
 	if (fd ==0){
