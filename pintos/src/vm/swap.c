@@ -20,7 +20,7 @@ swap_init (void)
 
     printf("temp\n");
     disk_sector_t secnum = bitmap_scan_and_flip(swap_table, 0, 1, false);
-    printf("temp2\n");
+    printf("temp2, %d\n", secnum);
 }
 
 
