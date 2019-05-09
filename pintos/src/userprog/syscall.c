@@ -92,7 +92,6 @@ static void
 syscall_handler (struct intr_frame *f) 
 {
   void* if_esp = f->esp;
-	printf("esp : %p\n", if_esp);
   if(is_kernel_vaddr(if_esp)){
     thread_exit(); 
     return;
@@ -219,6 +218,7 @@ syscall_handler (struct intr_frame *f)
 
 
 		case SYS_MMAP:
+			printf("mmap came\n");
 			argv0 = *p_argv(if_esp+4);
 			argv1 = *p_argv(if_esp+8);
 			filelock_acquire();
@@ -325,7 +325,7 @@ int create (const char *file, unsigned initial_size, void* esp){
 	printf("create, file : %p\n", file);
 	check_page(file, initial_size, esp);
 
-	return filesys_create(file, initial_size);
+	return filesys_create(file, initial_size); 
 }
 
 int remove (const char *file){
