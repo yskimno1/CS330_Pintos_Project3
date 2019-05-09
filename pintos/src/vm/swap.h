@@ -15,13 +15,13 @@ void read_from_disk (void *frame_addr, disk_sector_t sector_num);
 void write_to_disk (void *frame_addr, disk_sector_t sector_num);
 
 /* The swap device */
-static struct disk *swap_device;
+struct disk *swap_device;
 
 /* Tracks in-use and free swap slots */
-static struct bitmap *swap_table;
+struct bitmap *swap_table;
 
 /* Protects swap_table */
-static struct lock swap_lock;
+struct lock swap_lock;
 
 
 
