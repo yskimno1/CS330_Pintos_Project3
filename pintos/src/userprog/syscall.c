@@ -123,11 +123,16 @@ syscall_handler (struct intr_frame *f)
   		break;
 
   	case SYS_CREATE:	/* Create a file. */
+			uint32_t* new1;
+			unsigned new2;
   		argv0 = *p_argv(if_esp+4);
       argv1 = *p_argv(if_esp+8);
+			new1 = p_argv(if_esp+4);
+			new2 = *((unsigned *) (p_argv(if_esp+8)));
 			printf("come to create\n");
 			filelock_acquire();
-			int result = create((const char*)argv0, (unsigned)argv1, if_esp);
+			// int result = create((const char*)argv0, (unsigned)argv1, if_esp);
+			int result = create((const char* )new1, (unsigned) new2, if_esp);
 			filelock_release();
 			if(result == -1){
 				exit(-1);
