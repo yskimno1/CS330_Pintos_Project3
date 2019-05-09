@@ -1,17 +1,9 @@
 #include "vm/swap.h"
 #include "devices/disk.h"
 #include "threads/synch.h"
-#include <bitmap.h>
+// #include <bitmap.h>
 #include "threads/vaddr.h"
-
-/* The swap device */
-static struct disk *swap_device;
-
-/* Tracks in-use and free swap slots */
-static struct bitmap *swap_table;
-
-/* Protects swap_table */
-static struct lock swap_lock;
+#include "lib/kernel/bitmap.h"
 
 /* 
  * Initialize swap_device, swap_table, and swap_lock.
@@ -29,8 +21,9 @@ swap_init (void)
 
 disk_sector_t
 get_empty_sector_num(void){
-    printf("at 0, %d\n", swap_table->bit_cnt);
-    
+    size_t temp = swap_table->bit_cnt;
+    printf("at 0, %d\n", temp);
+
     size_t bitmap_idx = bitmap_scan_and_flip(swap_table, 0, 1, false);
     printf("bitmapidx : %d\n", bitmap_idx);
     if(bitmap_idx != BITMAP_ERROR) return bitmap_idx * PGSIZE/DISK_SECTOR_SIZE;
