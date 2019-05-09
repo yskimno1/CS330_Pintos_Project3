@@ -17,9 +17,8 @@ struct sup_page_table_entry
 
 	struct list_elem elem;
 
-	bool dirty;
 	bool accessed;
-	
+	bool is_swapped;
 
 	struct file* file;
 	int32_t offset;

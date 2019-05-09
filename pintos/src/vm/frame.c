@@ -94,17 +94,16 @@ evict_frame (void){
     if(!list_empty(&frame_table)){
         for(e = list_begin(&frame_table); e != list_end(&frame_table); e = list_next(e)){
             fte = list_entry(e, struct frame_table_entry, elem_table_list);
-            if(fte->spte->accessed == false){
+            if(!pagedir_is_accessed(fte->owner->pagedir, fte->spte->user_vaddr)){
                 if(fte->spte->file_type == TYPE_MMAP) ASSERT(0);
 
                 if(pagedir_is_dirty(fte->owner->pagedir, fte->spte->user_vaddr) || fte->spte->file_type == TYPE_SWAP){
                     fte->spte->file_type = TYPE_SWAP;
                     fte->spte->swap_num = swap_out(fte->frame);
-                    // printf("swap num : %d\n", fte->spte->swap_num);
+                    fte->spte->is_swapped = true;
                 }
                 list_remove(&fte->elem_table_list);
                 pagedir_clear_page(fte->owner->pagedir, fte->spte->user_vaddr);
-                // printf("frame which evicted : %p\n", fte->frame);
                 palloc_free_page(fte->frame);
                 
                 fte->spte->loaded = false;
@@ -113,23 +112,22 @@ evict_frame (void){
                 return true;
             } 
             else{
-                fte->spte->accessed = true;
+                pagedir_set_accessed(fte->owner->pagedir, fte->spte->user_vaddr, true);
             }
         }
 
         /* second chance */
         for(e = list_begin(&frame_table); e != list_end(&frame_table); e = list_next(e)){
             fte = list_entry(e, struct frame_table_entry, elem_table_list);
-            if(fte->spte->accessed == false){
+            if!pagedir_is_accessed(fte->owner->pagedir, fte->spte->user_vaddr)){
                 if(pagedir_is_dirty(fte->owner->pagedir, fte->spte->user_vaddr) || fte->spte->file_type == TYPE_SWAP){
                     fte->spte->file_type = TYPE_SWAP;
                     fte->spte->swap_num = swap_out(fte->frame);
-                    printf("swap num at second chance : %d\n", fte->spte->swap_num);
+                    fte->spte->is_swapped = true;
                 }
 
                 list_remove(&fte->elem_table_list);
                 pagedir_clear_page(fte->owner->pagedir, fte->spte->user_vaddr);
-                printf("frame which evicted at second chance : %p\n", fte->frame);
                 palloc_free_page(fte->frame);
 
                 fte->spte->loaded = false;
@@ -138,7 +136,7 @@ evict_frame (void){
                 return true;
             } 
             else{
-                fte->spte->accessed = true;
+                pagedir_set_accessed(fte->owner->pagedir, fte->spte->user_vaddr, true);
             }
         }   
     }
