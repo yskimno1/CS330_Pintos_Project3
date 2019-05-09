@@ -470,6 +470,7 @@ int mmap(int fd, void* addr){ //needs lazy loading
 	if(f == NULL || fd==1 || fd==0){
 		return -1;
 	}
+	if(pg_ofs(addr)!=0 || addr==0) return -1;
 
 	struct file* f_reopen = file_reopen(f);
 	if(f_reopen == NULL){
@@ -499,7 +500,7 @@ int mmap(int fd, void* addr){ //needs lazy loading
 				lock_release(&lock_frame);
 				return false;
 			}
-			// printf("map id in thrad : %d\n", thread_current()->map_id);
+
 			mmap_e->spt_e = spt_e;
 			mmap_e->spt_e->map_id = thread_current()->map_id;
 
@@ -507,7 +508,7 @@ int mmap(int fd, void* addr){ //needs lazy loading
 
 			bool success = page_insert(spt_e);
 			if(success == false){
-				// printf("need to unmap!\n");
+
 				list_remove(&mmap_e->elem_mmap);
 				thread_current()->map_id -= 1;
 				lock_release(&lock_frame);
@@ -516,6 +517,10 @@ int mmap(int fd, void* addr){ //needs lazy loading
 			else{
 					lock_release(&lock_frame);
 			}
+		}
+		else{
+			// spt_e exists, so load
+			file_handling(mmap_e->spt_e);
 		}
 		/* do we need to check other mmaps? */
 		read_bytes -= page_read_bytes;
