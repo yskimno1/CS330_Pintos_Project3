@@ -18,8 +18,8 @@ swap_init (void)
     bitmap_set_all(swap_table, 0);
     lock_init(&swap_lock);
 
-    size_t temp1 = bitmap_count(swap_table, 0, bitmap_size(b), 0);
-    size_t temp2 = bitmap_count(swap_table, 0, bitmap_size(b), 1);
+    size_t temp1 = bitmap_count(swap_table, 0, bitmap_size(swap_table), 0);
+    size_t temp2 = bitmap_count(swap_table, 0, bitmap_size(swap_table), 1);
     
     printf("temp1 : %d\n", temp1);
     printf("temp2, %d\n", temp2);
