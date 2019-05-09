@@ -119,7 +119,7 @@ evict_frame (void){
         /* second chance */
         for(e = list_begin(&frame_table); e != list_end(&frame_table); e = list_next(e)){
             fte = list_entry(e, struct frame_table_entry, elem_table_list);
-            if!pagedir_is_accessed(fte->owner->pagedir, fte->spte->user_vaddr)){
+            if(!pagedir_is_accessed(fte->owner->pagedir, fte->spte->user_vaddr)){
                 if(pagedir_is_dirty(fte->owner->pagedir, fte->spte->user_vaddr) || fte->spte->file_type == TYPE_SWAP){
                     fte->spte->file_type = TYPE_SWAP;
                     fte->spte->swap_num = swap_out(fte->frame);
