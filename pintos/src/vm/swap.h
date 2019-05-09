@@ -4,6 +4,9 @@
 
 #include "lib/kernel/bitmap.h"
 
+#ifndef VM_SWAP_H
+#define VM_SWAP_H
+
 void swap_init (void);
 bool swap_in (void *frame_addr, disk_sector_t sector_num);
 disk_sector_t swap_out (void *frame_addr);
@@ -19,8 +22,6 @@ static struct bitmap *swap_table;
 /* Protects swap_table */
 static struct lock swap_lock;
 
-#ifndef VM_SWAP_H
-#define VM_SWAP_H
 
 
 
