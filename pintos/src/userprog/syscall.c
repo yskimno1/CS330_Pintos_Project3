@@ -255,6 +255,7 @@ void
 check_page(void* buffer, unsigned size, void* esp){
 	void* ptr = buffer;
 	for(;ptr<buffer+size; ptr++){
+		printf("111\n");
 		if (is_bad_pointer(ptr)){
 			// printf("came!\n");
 			struct sup_page_table_entry* spt_e = find_page(ptr);
@@ -314,6 +315,7 @@ int create (const char *file, unsigned initial_size){
   if (!string_validate(file)){
     return -1;
   }
+	printf("222\n");
 	if (is_bad_pointer(file+initial_size)) return -1;
   if (strlen(file)>14)
     return 0;
@@ -552,6 +554,7 @@ string_validate(const char* ptr){
 
 bool
 is_bad_pointer(const char* ptr){
+	printf("333\n");
 	void* ptr_page = pagedir_get_page(thread_current()->pagedir, ptr);
 	if(!ptr_page){
 		// printf("bad pointer at %p\n", ptr);
