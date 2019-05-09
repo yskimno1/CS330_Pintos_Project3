@@ -17,6 +17,10 @@ swap_init (void)
     if(swap_table == NULL) ASSERT(0);
     bitmap_set_all(swap_table, false);
     lock_init(&swap_lock);
+
+    printf("temp\n");
+    disk_sector_t secnum = bitmap_scan_and_flip(swap_table, 0, 1, false);
+    printf("temp2\n")
 }
 
 
