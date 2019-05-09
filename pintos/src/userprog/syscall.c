@@ -316,6 +316,7 @@ int create (const char *file, unsigned initial_size){
     return -1;
   }
 	printf("222\n");
+	printf("file : %p, size : %d\n", file, initial_size);
 	if (is_bad_pointer(file+initial_size)) return -1;
   if (strlen(file)>14)
     return 0;
@@ -554,7 +555,6 @@ string_validate(const char* ptr){
 
 bool
 is_bad_pointer(const char* ptr){
-	printf("333\n");
 	void* ptr_page = pagedir_get_page(thread_current()->pagedir, ptr);
 	if(!ptr_page){
 		// printf("bad pointer at %p\n", ptr);
