@@ -322,6 +322,12 @@ int create (const char *file, unsigned initial_size, void* esp){
   if (strlen(file)>14){
     return 0;
 	}
+	struct list_elem* e;
+	for(e=list_begin(&thread_current()->sup_page_table); e!=list_end(&thread_current()->sup_page_table; e=list_next(e)){
+		struct sup_page_table_entry* spt_e = list_entry(e, struct sup_page_table_entry, elem);
+		printf("sup page table addr : %p\n", spt_e);
+	}
+
 	printf("create, file : %p\n", file);
 	check_page(file, initial_size, esp);
 
