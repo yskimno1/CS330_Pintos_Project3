@@ -92,6 +92,7 @@ static void
 syscall_handler (struct intr_frame *f) 
 {
   void* if_esp = f->esp;
+	printf("esp : %p\n", if_esp);
   if(is_kernel_vaddr(if_esp)){
     thread_exit(); 
     return;
