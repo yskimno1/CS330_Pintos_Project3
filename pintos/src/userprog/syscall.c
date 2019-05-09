@@ -123,8 +123,6 @@ syscall_handler (struct intr_frame *f)
   		break;
 
   	case SYS_CREATE:	/* Create a file. */
-			uint32_t* new1;
-			unsigned new2;
   		argv0 = *p_argv(if_esp+4);
       argv1 = *p_argv(if_esp+8);
 
