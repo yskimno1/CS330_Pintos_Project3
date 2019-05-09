@@ -58,6 +58,7 @@ void page_init (void);
 struct sup_page_table_entry*  allocate_page(void *addr, bool loaded, enum palloc_type p_type, uint32_t read_bytes, uint32_t zero_bytes, struct file *file, int32_t offset, bool writable);
 void page_done(void);
 struct sup_page_table_entry* find_page(void* addr);
+void* free_page(struct list_elem* e);
 bool grow_stack(void* addr, enum palloc_type ptype);
 
 bool page_handling(struct sup_page_table_entry* spt_e);

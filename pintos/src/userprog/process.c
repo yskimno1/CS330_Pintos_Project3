@@ -172,6 +172,11 @@ process_exit (void)
   file_close(curr->main_file);  
   filelock_release();
 
+  while(!list_empty(&curr->sup_page_table)){
+    struct list_elem* e = list_pop_front(&curr->sup_page_table);
+    free_page(e);  
+  }
+
   // struct list_elem* e;
   // struct list_elem* e_next;
   // e=list_begin(&curr->sup_page_table);
