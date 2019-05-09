@@ -527,7 +527,7 @@ int mmap(int fd, void* addr){ //needs lazy loading
 
 void munmap(int mapid){
 	// printf("unmap came!\n");
-	filelock_acquire();
+	lock_acquire(&lock_frame);
 	struct list_elem* e;
 	if(!list_empty(&thread_current()->list_mmap)){
 		for(e=list_begin(&thread_current()->list_mmap); e!=list_end(&thread_current()->list_mmap); e=list_next(e)){
@@ -548,7 +548,7 @@ void munmap(int mapid){
 		}
 	}
 
-	filelock_release();
+	lock_release(&lock_frame);
 	return;
 }
 

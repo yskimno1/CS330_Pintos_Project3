@@ -132,6 +132,11 @@ page_handling(struct sup_page_table_entry* spt_e){
 }
 
 bool
+mmap_handling(struct sup_page_table_entry* spt_e){
+    return true;
+}
+
+bool
 file_handling(struct sup_page_table_entry* spt_e){
     // printf("file handling! \n");
     void* frame;
