@@ -505,11 +505,11 @@ int mmap(int fd, void* addr){ //needs lazy loading
 	while(read_bytes > 0){
 		size_t page_read_bytes = read_bytes < PGSIZE ? read_bytes : PGSIZE;
 		size_t page_zero_bytes = PGSIZE - page_read_bytes;
-		struct sup_page_table_entry* spt_e = find_page(addr);
+		struct sup_page_table_entry* spt_e = find_page(addr+offset);
 		lock_acquire(&lock_frame);
 		if(spt_e == NULL){
 
-			spt_e = allocate_page(addr, false, CREATE_MMAP, page_read_bytes, page_zero_bytes, f_reopen, offset, true);
+			spt_e = allocate_page(addr+offset, false, CREATE_MMAP, page_read_bytes, page_zero_bytes, f_reopen, 0, true);
 			if(spt_e == NULL){
 				lock_release(&lock_frame);
 				filelock_release();
