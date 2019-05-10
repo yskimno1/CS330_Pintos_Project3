@@ -464,6 +464,18 @@ void close (int fd){
 	filelock_release();
 }
 
+bool exist_same_mmap(struct file* file){
+	struct list_elem* e;
+	if(!list_empty(&thread_current()->list_mmap)){
+		for(e=list_begin(&thread_current()->list_mmap), e!=list_end(&thread_current()->list_mmap), e=list_next(e)){
+			struct page_mmap* mmap_e = list_entry(e,struct page_mmap, elem_mmap);
+			if(mmap_e->spt_e->file == file) return true;
+
+		}
+	}
+	return false;
+}
+
 int mmap(int fd, void* addr){ //needs lazy loading
 
 	struct thread* curr = thread_current();
@@ -482,6 +494,8 @@ int mmap(int fd, void* addr){ //needs lazy loading
 	uint32_t zero_bytes = 0;
 	off_t offset = 0;
 
+	if(exist_same_mmap(f)) return -1;
+
 	while(read_bytes > 0){
 		size_t page_read_bytes = read_bytes < PGSIZE ? read_bytes : PGSIZE;
 		size_t page_zero_bytes = PGSIZE - page_read_bytes;
@@ -492,7 +506,7 @@ int mmap(int fd, void* addr){ //needs lazy loading
 			spt_e = allocate_page(addr, false, CREATE_MMAP, page_read_bytes, page_zero_bytes, f_reopen, offset, true);
 			if(spt_e == NULL){
 				lock_release(&lock_frame);
-				return false;
+				return -1;
 			}
 
 			struct page_mmap* mmap_e = malloc(sizeof(struct page_mmap));
