@@ -534,8 +534,12 @@ int mmap(int fd, void* addr){ //needs lazy loading
 		}
 		else{
 			// spt_e exists, so load
-			// file_handling(spt_e);
-			return -1;
+			if(spt_e->file_type == TYPE_MMAP)  return -1;
+			else{
+				bool success =file_handling(spt_e);
+				if(success == false) ASSERT(0);
+
+			}
 		}
 		/* do we need to check other mmaps? */
 		read_bytes -= page_read_bytes;
