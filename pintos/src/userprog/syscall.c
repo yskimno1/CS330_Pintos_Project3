@@ -467,7 +467,7 @@ int mmap(int fd, void* addr){ //needs lazy loading
 
 	struct thread* curr = thread_current();
 	struct file* f = curr->fdt[fd];
-	if(f == NULL || fd==1 || fd==0){
+	if(f == NULL){
 		return -1;
 	}
 	if(pg_ofs(addr)!=0 || addr==0) return -1;
@@ -498,7 +498,7 @@ int mmap(int fd, void* addr){ //needs lazy loading
 			if(mmap_e == NULL){
 				free(spt_e);
 				lock_release(&lock_frame);
-				return false;
+				return -1;
 			}
 
 			mmap_e->spt_e = spt_e;
