@@ -526,9 +526,11 @@ int mmap(int fd, void* addr){ //needs lazy loading
 		zero_bytes -= page_zero_bytes;
 		offset += page_read_bytes;
 	}
-	// printf("map_id in thread_current : %d\n", thread_current()->map_id);
+	printf("map_id in thread_current : %d\n", thread_current()->map_id);
+
+	int return_value = thread_current()->map_id;
 	thread_current()->map_id += 1;
-	return (thread_current()->map_id-1);
+	return return_value;
 }
 
 void munmap(int mapid){
