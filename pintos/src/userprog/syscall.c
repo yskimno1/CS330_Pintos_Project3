@@ -494,7 +494,7 @@ int mmap(int fd, void* addr){ //needs lazy loading
 	uint32_t zero_bytes = 0;
 	off_t offset = 0;
 
-	if(exist_same_mmap(f)) return -1;
+	// if(exist_same_mmap(f)) return -1;
 
 	while(read_bytes > 0){
 		size_t page_read_bytes = read_bytes < PGSIZE ? read_bytes : PGSIZE;
@@ -534,7 +534,8 @@ int mmap(int fd, void* addr){ //needs lazy loading
 		}
 		else{
 			// spt_e exists, so load
-			file_handling(spt_e);
+			// file_handling(spt_e);
+			return -1;
 		}
 		/* do we need to check other mmaps? */
 		read_bytes -= page_read_bytes;
