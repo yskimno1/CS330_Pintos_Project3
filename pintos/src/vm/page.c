@@ -72,7 +72,6 @@ allocate_page (void* addr, bool loaded, enum palloc_type p_type, uint32_t read_b
         if(p_type == CREATE_MMAP){
             spt_e->file_type = TYPE_MMAP;
             spt_e->map_id = thread_current()->map_id;
-            printf("mapped : %d\n", spt_e->map_id);
         }
     }
     else ASSERT(0);
