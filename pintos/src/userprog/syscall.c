@@ -558,7 +558,6 @@ int mmap(int fd, void* addr){ //needs lazy loading
 				list_remove(&mmap_e->elem_mmap);
 				lock_release(&lock_frame);
 				filelock_release();
-				printf("555\n");
 				return -1;
 			}
 		}
