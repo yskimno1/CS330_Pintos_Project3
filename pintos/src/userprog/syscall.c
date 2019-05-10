@@ -510,7 +510,6 @@ int mmap(int fd, void* addr){ //needs lazy loading
 			if(success == false){
 
 				list_remove(&mmap_e->elem_mmap);
-				thread_current()->map_id -= 1;
 				lock_release(&lock_frame);
 				return -1;
 			}
@@ -528,7 +527,8 @@ int mmap(int fd, void* addr){ //needs lazy loading
 		offset += page_read_bytes;
 	}
 	// printf("map_id in thread_current : %d\n", thread_current()->map_id);
-	return thread_current()->map_id;
+	thread_current()->map_id += 1;
+	return (thread_current()->map_id-1);
 }
 
 void munmap(int mapid){
