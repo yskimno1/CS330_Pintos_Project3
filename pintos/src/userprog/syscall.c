@@ -508,6 +508,7 @@ int mmap(int fd, void* addr){ //needs lazy loading
 		struct sup_page_table_entry* spt_e = find_page(addr);
 
 		if(spt_e == NULL){
+			printf("spte null\n");
 			lock_acquire(&lock_frame);
 			spt_e = allocate_page(addr, false, CREATE_MMAP, page_read_bytes, page_zero_bytes, f_reopen, offset, true);
 			if(spt_e == NULL){
