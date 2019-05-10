@@ -131,36 +131,6 @@ page_handling(struct sup_page_table_entry* spt_e){
 }
 
 bool
-mmap_handling(struct sup_page_table_entry* spt_e){
-
-    void* frame;
-    if(spt_e->read_bytes == 0) frame = allocate_frame(spt_e, PAL_USER|PAL_ZERO);
-    else frame = allocate_frame(spt_e, PAL_USER);
-    if(frame == NULL) return false;
-
-    if(spt_e->read_bytes > 0){
-        off_t temp = file_read_at (spt_e->file, frame, spt_e->read_bytes, spt_e->offset);
-        // printf("temp : %d\n", temp);
-        if (temp != (int) spt_e->read_bytes){
-            free_frame(frame);
-            ASSERT(0);
-            return false; 
-        }
-        memset (frame + spt_e->read_bytes, 0, spt_e->zero_bytes);
-    }
-    bool success = install_page(spt_e->user_vaddr, frame, spt_e->writable);
-
-    if(success == false){
-        free_frame(frame);
-        return false;
-    }
-
-    spt_e->loaded = true;
-
-    return true;
-}
-
-bool
 file_handling(struct sup_page_table_entry* spt_e){
     // printf("file handling! \n");
     void* frame;
