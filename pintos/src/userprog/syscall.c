@@ -467,7 +467,7 @@ void close (int fd){
 bool exist_same_mmap(struct file* file){
 	struct list_elem* e;
 	if(!list_empty(&thread_current()->list_mmap)){
-		for(e=list_begin(&thread_current()->list_mmap), e!=list_end(&thread_current()->list_mmap), e=list_next(e)){
+		for(e=list_begin(&thread_current()->list_mmap); e!=list_end(&thread_current()->list_mmap); e=list_next(e)){
 			struct page_mmap* mmap_e = list_entry(e,struct page_mmap, elem_mmap);
 			if(mmap_e->spt_e->file == file) return true;
 
