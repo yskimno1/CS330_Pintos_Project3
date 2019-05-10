@@ -226,8 +226,9 @@ syscall_handler (struct intr_frame *f)
 			break;
 
 		case SYS_MUNMAP:
+			argv0 = *p_argv(if_esp+4);
 			filelock_acquire();
-			munmap(thread_current()->map_id);
+			munmap((int)argv0);
 			filelock_release();
 			break;
   	default:
@@ -526,7 +527,6 @@ int mmap(int fd, void* addr){ //needs lazy loading
 		zero_bytes -= page_zero_bytes;
 		offset += page_read_bytes;
 	}
-	printf("map_id in thread_current : %d\n", thread_current()->map_id);
 
 	int return_value = thread_current()->map_id;
 	thread_current()->map_id += 1;
@@ -535,12 +535,12 @@ int mmap(int fd, void* addr){ //needs lazy loading
 
 void munmap(int mapid){
 	// printf("unmap came!\n");
+
 	lock_acquire(&lock_frame);
 	struct list_elem* e;
 	e = list_begin(&thread_current()->list_mmap);
 	while(e!=list_end(&thread_current()->list_mmap)){
 		struct page_mmap* mmap_e = list_entry(e,struct page_mmap, elem_mmap);
-		printf("map_id : %d, mapid : %d\n", mmap_e->spt_e->map_id, mapid);
 		if(mmap_e->spt_e->map_id == mapid){
 			// printf("begin! map id : %d, addr %p\n", mapid, mmap_e->spt_e);
 			if(pagedir_is_dirty(thread_current()->pagedir, mmap_e->spt_e->user_vaddr)){
