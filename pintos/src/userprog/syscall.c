@@ -506,14 +506,14 @@ int mmap(int fd, void* addr){ //needs lazy loading
 		size_t page_read_bytes = read_bytes < PGSIZE ? read_bytes : PGSIZE;
 		size_t page_zero_bytes = PGSIZE - page_read_bytes;
 		struct sup_page_table_entry* spt_e = find_page(addr);
-
+		lock_acquire(&lock_frame);
 		if(spt_e == NULL){
-			printf("spte null\n");
-			lock_acquire(&lock_frame);
+
 			spt_e = allocate_page(addr, false, CREATE_MMAP, page_read_bytes, page_zero_bytes, f_reopen, offset, true);
 			if(spt_e == NULL){
 				lock_release(&lock_frame);
 				filelock_release();
+				printf("here1\n");
 				return -1;
 			}
 
@@ -522,6 +522,7 @@ int mmap(int fd, void* addr){ //needs lazy loading
 				free(spt_e);
 				lock_release(&lock_frame);
 				filelock_release();
+				printf("222\n");
 				return -1;
 			}
 
@@ -534,18 +535,17 @@ int mmap(int fd, void* addr){ //needs lazy loading
 				list_remove(&mmap_e->elem_mmap);
 				lock_release(&lock_frame);
 				filelock_release();
+				printf("333\n");
 				return -1;
 			}
-			else lock_release(&lock_frame);
-
 		}
 		else{
-			lock_acquire(&lock_frame);
 			struct page_mmap* mmap_e = malloc(sizeof(struct page_mmap));
 			if(mmap_e == NULL){
 				free(spt_e);
 				lock_release(&lock_frame);
 				filelock_release();
+				printf("444\n");
 				return -1;
 			}
 
@@ -558,11 +558,11 @@ int mmap(int fd, void* addr){ //needs lazy loading
 				list_remove(&mmap_e->elem_mmap);
 				lock_release(&lock_frame);
 				filelock_release();
+				printf("555\n");
 				return -1;
 			}
-			else lock_release(&lock_frame);
 		}
-
+		lock_release(&lock_frame);
 		/* do we need to check other mmaps? */
 		read_bytes -= page_read_bytes;
 		zero_bytes -= page_zero_bytes;
