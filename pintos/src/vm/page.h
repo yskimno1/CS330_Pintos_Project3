@@ -63,5 +63,5 @@ bool grow_stack(void* addr, enum palloc_type ptype);
 bool page_handling(struct sup_page_table_entry* spt_e);
 bool swap_handling(struct sup_page_table_entry* spt_e);
 bool file_handling(struct sup_page_table_entry* spt_e);
-
+bool mmap_handling(struct sup_page_table_entry* spt_e);
 #endif /* vm/page.h */

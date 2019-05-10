@@ -502,8 +502,6 @@ int mmap(int fd, void* addr){ //needs lazy loading
 	uint32_t zero_bytes = 0;
 	off_t offset = 0;
 
-	// if(exist_same_mmap(f)) return -1;
-
 	while(read_bytes > 0){
 		size_t page_read_bytes = read_bytes < PGSIZE ? read_bytes : PGSIZE;
 		size_t page_zero_bytes = PGSIZE - page_read_bytes;
@@ -528,32 +526,32 @@ int mmap(int fd, void* addr){ //needs lazy loading
 
 			mmap_e->spt_e = spt_e;
 			mmap_e->spt_e->map_id = thread_current()->map_id;
-
 			list_push_back(&thread_current()->list_mmap, &mmap_e->elem_mmap);
 
 			bool success = page_insert(spt_e);
 			if(success == false){
-
 				list_remove(&mmap_e->elem_mmap);
 				lock_release(&lock_frame);
 				filelock_release();
 				return -1;
 			}
-			else{
-					lock_release(&lock_frame);
-			}
+			else lock_release(&lock_frame);
+
 		}
-		else{
-			// spt_e exists, so load
-			if(spt_e->file_type == TYPE_MMAP){
-				filelock_release();
-				return -1;
-			}
-			else{
-				bool success = file_handling(spt_e);
-				if(success == false) ASSERT(0);
-			}
-		}
+		// else{
+		// 	// spt_e exists, so load
+		// 	if(spt_e->file_type == TYPE_MMAP){
+		// 		filelock_release();
+		// 		return -1;
+		// 	}
+		// 	else{
+		// 		lock_acquire(&lock_frame);
+		// 		bool success = mmap_handling(spt_e);
+		// 		lock_release(&lock_frame);
+		// 		if(success == false) ASSERT(0);
+		// 	}
+		// }
+
 		/* do we need to check other mmaps? */
 		read_bytes -= page_read_bytes;
 		zero_bytes -= page_zero_bytes;
