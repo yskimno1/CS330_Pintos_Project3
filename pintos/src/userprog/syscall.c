@@ -220,9 +220,8 @@ syscall_handler (struct intr_frame *f)
 		case SYS_MMAP:
 			argv0 = *p_argv(if_esp+4);
 			argv1 = *p_argv(if_esp+8);
-			filelock_acquire();
+
 			f->eax = mmap((int)argv0, (void *)argv1);
-			filelock_release();
 			break;
 
 		case SYS_MUNMAP:
@@ -477,20 +476,29 @@ bool exist_same_mmap(struct file* file){
 }
 
 int mmap(int fd, void* addr){ //needs lazy loading
-
+	filelock_acquire();
 	struct thread* curr = thread_current();
 	struct file* f = curr->fdt[fd];
 	if(f == NULL){
+		filelock_release();
 		return -1;
 	}
-	if(pg_ofs(addr)!=0 || addr==0) return -1;
+	if(pg_ofs(addr)!=0 || addr==0){
+		filelock_release();
+		return -1;
+	}
 
 	struct file* f_reopen = file_reopen(f);
 	if(f_reopen == NULL){
+		filelock_release();
 		return -1;
 	}
 
 	uint32_t read_bytes = file_length(f_reopen);
+	if(read_bytes == 0){
+		filelock_release();
+		return -1;
+	}
 	uint32_t zero_bytes = 0;
 	off_t offset = 0;
 
@@ -506,6 +514,7 @@ int mmap(int fd, void* addr){ //needs lazy loading
 			spt_e = allocate_page(addr, false, CREATE_MMAP, page_read_bytes, page_zero_bytes, f_reopen, offset, true);
 			if(spt_e == NULL){
 				lock_release(&lock_frame);
+				filelock_release();
 				return -1;
 			}
 
@@ -513,6 +522,7 @@ int mmap(int fd, void* addr){ //needs lazy loading
 			if(mmap_e == NULL){
 				free(spt_e);
 				lock_release(&lock_frame);
+				filelock_release();
 				return -1;
 			}
 
@@ -526,6 +536,7 @@ int mmap(int fd, void* addr){ //needs lazy loading
 
 				list_remove(&mmap_e->elem_mmap);
 				lock_release(&lock_frame);
+				filelock_release();
 				return -1;
 			}
 			else{
@@ -534,11 +545,13 @@ int mmap(int fd, void* addr){ //needs lazy loading
 		}
 		else{
 			// spt_e exists, so load
-			if(spt_e->file_type == TYPE_MMAP)  return -1;
+			if(spt_e->file_type == TYPE_MMAP){
+				filelock_release();
+				return -1;
+			}
 			else{
-				bool success =file_handling(spt_e);
+				bool success = file_handling(spt_e);
 				if(success == false) ASSERT(0);
-
 			}
 		}
 		/* do we need to check other mmaps? */
@@ -549,6 +562,7 @@ int mmap(int fd, void* addr){ //needs lazy loading
 
 	int return_value = thread_current()->map_id;
 	thread_current()->map_id += 1;
+	filelock_release();
 	return return_value;
 }
 
