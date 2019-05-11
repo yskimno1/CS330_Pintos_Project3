@@ -93,7 +93,6 @@ evict_frame (void){
         for(e = list_begin(&frame_table); e != list_end(&frame_table); e = list_next(e)){
             fte = list_entry(e, struct frame_table_entry, elem_table_list);
             if(!pagedir_is_accessed(fte->owner->pagedir, fte->spte->user_vaddr)){
-                printf("spte : %p\n, useraddr : %p\n", fte->spte, fte->spte->user_vaddr);
                 if(fte->spte->file_type == TYPE_MMAP) ASSERT(0);
 
                 if(pagedir_is_dirty(fte->owner->pagedir, fte->spte->user_vaddr) || fte->spte->file_type == TYPE_SWAP){
@@ -102,8 +101,6 @@ evict_frame (void){
                     fte->spte->is_swapped = true;
                 }
                 list_remove(&fte->elem_table_list);
-                printf("spte : %p\n, useraddr : %p\n", fte->spte, fte->spte->user_vaddr);
-                printf("1type : %d\n", fte->spte->file_type);
                 pagedir_clear_page(fte->owner->pagedir, fte->spte->user_vaddr);
                 palloc_free_page(fte->frame);
                 
@@ -128,7 +125,6 @@ evict_frame (void){
                 }
 
                 list_remove(&fte->elem_table_list);
-                printf("2type : %d\n", fte->spte->file_type);
                 pagedir_clear_page(fte->owner->pagedir, fte->spte->user_vaddr);
                 palloc_free_page(fte->frame);
 

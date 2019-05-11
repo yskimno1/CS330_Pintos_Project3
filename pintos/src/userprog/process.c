@@ -160,7 +160,6 @@ process_exit (void)
   struct thread *curr = thread_current ();
   uint32_t *pd;
   /* unmap all */
-  printf("exit!\n");
 
   curr->is_exited = true;
   sema_up(&curr->sema_wait);
@@ -210,7 +209,6 @@ process_exit (void)
   //   free(spt_e);
   //   e = e_next;
   // }
-  printf("exit done\n");
 
   /* Destroy the current process's page directory and switch back
     to the kernel-only page directory. */

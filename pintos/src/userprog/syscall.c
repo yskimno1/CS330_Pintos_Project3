@@ -546,7 +546,6 @@ int mmap(int fd, void* addr){ //needs lazy loading
 				free(spt_e);
 				lock_release(&lock_frame);
 				filelock_release();
-				printf("444\n");
 				return -1;
 			}
 
