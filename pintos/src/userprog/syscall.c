@@ -408,12 +408,14 @@ int write (int fd, const void *buffer, unsigned size, void* esp){
   	return cnt;
   }
   if (!string_validate(buffer)){
+		printf("here1\n");
 		exit(-1);
     return cnt;
 	}
 	check_page(buffer, size, esp);
 
 	if (fd ==0){
+		printf("here2\n");
 		exit(-1);
 		return -1;
 	}
