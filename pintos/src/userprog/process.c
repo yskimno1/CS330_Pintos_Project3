@@ -185,11 +185,6 @@ process_exit (void)
 	}
   lock_release(&lock_frame);
 
-  int i;
-  for(i=0; i<FILE_MAX; i++){
-    file_close(curr->fdt[i]);
-  }
-
   while(!list_empty(&curr->sup_page_table)){ 
     struct list_elem* e = list_pop_front(&curr->sup_page_table);
     /* need to change bitmap, too.. */
@@ -200,6 +195,11 @@ process_exit (void)
   sema_up(&curr->sema_wait);
   /* wait until parent removes the child in the list */
   sema_down(&curr->sema_exited);
+
+  int i;
+  for(i=0; i<FILE_MAX; i++){
+    file_close(curr->fdt[i]);
+  }
 
   // struct list_elem* e;
   // struct list_elem* e_next;
