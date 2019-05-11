@@ -160,6 +160,7 @@ process_exit (void)
   struct thread *curr = thread_current ();
   uint32_t *pd;
   /* unmap all */
+  printf("exit!\n");
   lock_acquire(&lock_frame);
   if(!list_empty(&thread_current()->list_mmap)){
 		for(e=list_begin(&thread_current()->list_mmap); e!=list_end(&thread_current()->list_mmap); e=list_next(e)){
