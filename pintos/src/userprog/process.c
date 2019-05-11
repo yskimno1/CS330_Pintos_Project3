@@ -179,7 +179,7 @@ process_exit (void)
   /* wait until parent removes the child in the list */
   sema_down(&curr->sema_exited);
 
-  file_close(thread_current()->main_file);
+  
 
   lock_acquire(&lock_frame);
   if(!list_empty(&thread_current()->list_mmap)){
