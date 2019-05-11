@@ -130,6 +130,7 @@ syscall_handler (struct intr_frame *f)
 			int result = create((const char*)argv0, (unsigned)argv1, if_esp);
 			filelock_release();
 			if(result == -1){
+				printf("create\n");
 				exit(-1);
 				break;
 			}
@@ -144,6 +145,7 @@ syscall_handler (struct intr_frame *f)
 			result = remove((const char* )argv0);
 			filelock_release();
 			if(result == -1){
+				printf("remove\n");
 				exit(-1);
 				break;
 			}
@@ -192,6 +194,7 @@ syscall_handler (struct intr_frame *f)
       argv1 = *p_argv(if_esp+8);
 			seek((int)argv0, (unsigned)argv1);
 			if(result == -1){
+				printf("seek\n");
 				exit(-1);
 				break;
 			}
@@ -204,6 +207,7 @@ syscall_handler (struct intr_frame *f)
   		argv0 = *p_argv(if_esp+4);
 			result = tell((int)argv0);
 			if(result == -1){
+				printf("tell\n");
 				exit(-1);
 				break;
 			}
@@ -239,9 +243,11 @@ uint32_t*
 p_argv(void* addr){
 	// printf("addr : %p\n", addr);
   if (addr==NULL){
+		printf("in p_argv 1\n");
     exit(-1);
 	}
   if (!is_user_vaddr(addr) || addr < STACK_BOTTOM){
+		printf("in_pargv 2\n");
     exit(-1);
 	}
 	// if(is_bad_pointer(addr)){
@@ -271,6 +277,7 @@ check_page(void* buffer, unsigned size, void* esp){
 				if(success == false){
 
 					filelock_release();
+					printf("in check_page\n");
 					exit(-1);
 				}
 			}
@@ -301,6 +308,7 @@ exit (int status){
 pid_t 
 exec (const char *cmd_line){
   if (!string_validate(cmd_line)){
+		printf("in exec\n");
     exit(-1);
 	}
 	tid_t pid = process_execute (cmd_line);
@@ -315,6 +323,7 @@ int create (const char *file, unsigned initial_size, void* esp){
 
   if (!string_validate(file)){
 		filelock_release();
+		printf("in create\n");
     exit(-1);
   }
 
@@ -376,6 +385,7 @@ int read (int fd, void *buffer, unsigned size, void* esp){
 	}
   if (!string_validate(buffer)){
 		filelock_release();
+		printf("in read\n");
 		exit(-1);
     return -1;
 	}
@@ -399,6 +409,7 @@ int read (int fd, void *buffer, unsigned size, void* esp){
 		}
 	}
 	filelock_release();
+	printf("read cnt : %d\n", cnt);
 	return cnt;
 }
 
@@ -450,6 +461,7 @@ int tell (int fd){
 
 void close (int fd){
 	if (!fd_validate(fd)){
+		printf("in close\n");
 		exit(-1);
 		return;
 	}
@@ -496,6 +508,7 @@ int mmap(int fd, void* addr){ //needs lazy loading
 	uint32_t read_bytes = file_length(f_reopen);
 	if(read_bytes == 0){
 		filelock_release();
+		printf("mmap 1\n");
 		return -1;
 	}
 	uint32_t zero_bytes = 0;
@@ -545,6 +558,7 @@ int mmap(int fd, void* addr){ //needs lazy loading
 				free(spt_e);
 				lock_release(&lock_frame);
 				filelock_release();
+				printf("444\n");
 				return -1;
 			}
 
@@ -557,6 +571,7 @@ int mmap(int fd, void* addr){ //needs lazy loading
 				list_remove(&mmap_e->elem_mmap);
 				lock_release(&lock_frame);
 				filelock_release();
+				printf("555\n");
 				return -1;
 			}
 		}
