@@ -160,7 +160,7 @@ process_exit (void)
   struct thread *curr = thread_current ();
   uint32_t *pd;
   /* unmap all */
-
+  filelock_acquire();
   if(!list_empty(&thread_current()->list_mmap)){
 		for(e=list_begin(&thread_current()->list_mmap); e!=list_end(&thread_current()->list_mmap); e=list_next(e)){
 			struct page_mmap* mmap_e = list_entry(e,struct page_mmap, elem_mmap);
@@ -171,7 +171,7 @@ process_exit (void)
       }
     }
 	}
-  int i;
+  filelock_release();
 
 
   curr->is_exited = true;
@@ -182,7 +182,6 @@ process_exit (void)
   /* wait until parent removes the child in the list */
 
   sema_down(&curr->sema_exited);
-
 
   lock_acquire(&lock_frame);
   if(!list_empty(&thread_current()->list_mmap)){
@@ -199,7 +198,7 @@ process_exit (void)
     /* need to change bitmap, too.. */
     free_page(e);  
   }
-
+  int i;
   for(i=0; i<FILE_MAX; i++){
     file_close(curr->fdt[i]);
   }
