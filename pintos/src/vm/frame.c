@@ -101,6 +101,7 @@ evict_frame (void){
                     fte->spte->is_swapped = true;
                 }
                 list_remove(&fte->elem_table_list);
+                printf("type : %d\n", fte->spte->file_type);
                 pagedir_clear_page(fte->owner->pagedir, fte->spte->user_vaddr);
                 palloc_free_page(fte->frame);
                 

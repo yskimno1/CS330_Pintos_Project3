@@ -147,7 +147,7 @@ pagedir_clear_page (uint32_t *pd, void *upage)
 {
   uint32_t *pte;
 
-  if(pg_ofs(upage != 0)) printf("pg_ofs : %p, %p\n", pg_ofs(upage), upage);
+  if(pg_ofs(upage != 0)) printf("pg_ofs : %p, %p\n", pg_ofs(upage), upage)
   ASSERT (pg_ofs (upage) == 0);
   ASSERT (is_user_vaddr (upage));
 
