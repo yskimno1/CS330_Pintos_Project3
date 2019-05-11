@@ -10,6 +10,7 @@
 #include "threads/vaddr.h"
 #include "userprog/process.h"
 #include "filesys/file.h"
+#include "threads/vaddr.h"
 // #include "filesys/directory.h"
 
 // #include "filesys/filesys.h"
