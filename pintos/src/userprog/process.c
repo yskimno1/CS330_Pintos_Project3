@@ -172,16 +172,17 @@ process_exit (void)
     }
 	}
   int i;
-  for(i=0; i<FILE_MAX; i++){
-    file_close(curr->fdt[i]);
-  }
+
 
   curr->is_exited = true;
+  filelock_acquire();
+  file_close(curr->main_file);
+  filelock_release();
   sema_up(&curr->sema_wait);
   /* wait until parent removes the child in the list */
 
   sema_down(&curr->sema_exited);
-  file_close(curr->main_file);
+
 
   lock_acquire(&lock_frame);
   if(!list_empty(&thread_current()->list_mmap)){
@@ -199,7 +200,9 @@ process_exit (void)
     free_page(e);  
   }
 
-
+  for(i=0; i<FILE_MAX; i++){
+    file_close(curr->fdt[i]);
+  }
 
   /* Destroy the current process's page directory and switch back
     to the kernel-only page directory. */
