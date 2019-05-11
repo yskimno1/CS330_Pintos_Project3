@@ -188,7 +188,7 @@ grow_stack(void* addr, enum palloc_type ptype){
         frame_addr = allocate_frame(spt_e, PAL_USER);
     }
     else if(ptype == GROW_STACK){
-        spt_e = allocate_page(addr, true, GROW_STACK, 0, 0, NULL, 0, 1);
+        spt_e = allocate_page(page_addr, true, GROW_STACK, 0, 0, NULL, 0, 1);
         frame_addr = allocate_frame(spt_e, PAL_USER|PAL_ZERO);
     }
     if(frame_addr==NULL){
