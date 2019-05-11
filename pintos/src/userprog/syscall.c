@@ -472,7 +472,6 @@ bool exist_same_mmap(struct file* file){
 }
 
 int mmap(int fd, void* addr){ //needs lazy loading
-	printf("mmap!\n");
 	filelock_acquire();
 	struct thread* curr = thread_current();
 	struct file* f = curr->fdt[fd];
@@ -573,7 +572,6 @@ int mmap(int fd, void* addr){ //needs lazy loading
 }
 
 void munmap(int mapid){
-	printf("unmap came!\n");
 
 	lock_acquire(&lock_frame);
 	struct list_elem* e;

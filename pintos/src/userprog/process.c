@@ -171,7 +171,10 @@ process_exit (void)
       }
     }
 	}
-    
+  int i;
+  for(i=0; i<FILE_MAX; i++){
+    file_close(curr->fdt[i]);
+  }
 
   curr->is_exited = true;
   sema_up(&curr->sema_wait);
@@ -196,10 +199,7 @@ process_exit (void)
     free_page(e);  
   }
 
-  int i;
-  for(i=0; i<FILE_MAX; i++){
-    file_close(curr->fdt[i]);
-  }
+
 
   /* Destroy the current process's page directory and switch back
     to the kernel-only page directory. */
