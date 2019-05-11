@@ -166,8 +166,6 @@ process_exit (void)
   /* wait until parent removes the child in the list */
   sema_down(&curr->sema_exited);
 
-  file_close(curr->main_file);  
-
   lock_acquire(&lock_frame);
 
   if(!list_empty(&thread_current()->list_mmap)){
@@ -190,6 +188,8 @@ process_exit (void)
 	}
   lock_release(&lock_frame);
 
+  file_close(curr->main_file);  
+
   while(!list_empty(&curr->sup_page_table)){ 
     struct list_elem* e = list_pop_front(&curr->sup_page_table);
     /* need to change bitmap, too.. */
@@ -200,18 +200,6 @@ process_exit (void)
   for(i=0; i<FILE_MAX; i++){
     file_close(curr->fdt[i]);
   }
-
-
-
-  // struct list_elem* e;
-  // struct list_elem* e_next;
-  // e=list_begin(&curr->sup_page_table);
-  // while(e != NULL){
-  //   e_next= list_next(e);
-  //   struct sup_page_table_entry* spt_e = list_entry(e, struct sup_page_table_entry, elem);
-  //   free(spt_e);
-  //   e = e_next;
-  // }
 
   /* Destroy the current process's page directory and switch back
     to the kernel-only page directory. */
