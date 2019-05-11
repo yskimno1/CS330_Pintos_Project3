@@ -173,16 +173,17 @@ process_exit (void)
 	}
   filelock_release();
 
-
+  filelock_acquire();
+  file_close(curr->main_file);
+  filelock_release();
+  
   curr->is_exited = true;
 
   sema_up(&curr->sema_wait);
   /* wait until parent removes the child in the list */
   sema_down(&curr->sema_exited);
-  
-  filelock_acquire();
-  file_close(curr->main_file);
-  filelock_release();
+
+
   lock_acquire(&lock_frame);
   if(!list_empty(&thread_current()->list_mmap)){
 		for(e=list_begin(&thread_current()->list_mmap); e!=list_end(&thread_current()->list_mmap); e=list_next(e)){
