@@ -52,7 +52,7 @@ page_insert(struct sup_page_table_entry* spt_e){
  */
 struct sup_page_table_entry* 
 allocate_page (void* addr, bool loaded, enum palloc_type p_type, uint32_t read_bytes, uint32_t zero_bytes, struct file* file, int32_t offset, bool writable){
-    if(is_kernel_addr(addr)) printf("!!! %p\n", addr);
+    if(is_kernel_vaddr(addr)) printf("!!! %p\n", addr);
     struct sup_page_table_entry* spt_e = malloc(sizeof(struct sup_page_table_entry));
     if(spt_e == NULL) return NULL;
     if(p_type == GROW_STACK || p_type == PAGE_FAULT){
