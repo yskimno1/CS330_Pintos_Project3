@@ -109,6 +109,7 @@ syscall_handler (struct intr_frame *f)
 
   	case SYS_EXIT:		/* Terminate this process. */
   		argv0 = *p_argv(if_esp+4);
+			printf("exit..\n");
   		exit((int)argv0);
   		break;
 
