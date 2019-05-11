@@ -161,31 +161,23 @@ process_exit (void)
   uint32_t *pd;
   /* unmap all */
 
-  curr->is_exited = true;
-  sema_up(&curr->sema_wait);
-  /* wait until parent removes the child in the list */
-  sema_down(&curr->sema_exited);
-
   lock_acquire(&lock_frame);
   if(!list_empty(&thread_current()->list_mmap)){
 		for(e=list_begin(&thread_current()->list_mmap); e!=list_end(&thread_current()->list_mmap); e=list_next(e)){
 			struct page_mmap* mmap_e = list_entry(e,struct page_mmap, elem_mmap);
       if(pagedir_is_dirty(thread_current()->pagedir, mmap_e->spt_e->user_vaddr)){
         file_write_at(mmap_e->spt_e->file, mmap_e->spt_e->user_vaddr, mmap_e->spt_e->read_bytes, mmap_e->spt_e->offset);
-        free_frame(pagedir_get_page(thread_current()->pagedir, mmap_e->spt_e->user_vaddr));
+        // free_frame(pagedir_get_page(thread_current()->pagedir, mmap_e->spt_e->user_vaddr));
         free_page(&mmap_e->spt_e->elem);
         list_remove(e);
       }
       else{
-        free_frame(pagedir_get_page(thread_current()->pagedir, mmap_e->spt_e->user_vaddr));
+        // free_frame(pagedir_get_page(thread_current()->pagedir, mmap_e->spt_e->user_vaddr));
         free_page(&mmap_e->spt_e->elem);
         list_remove(e);
       }
     }
 	}
-
-  lock_release(&lock_frame);
-
   filelock_acquire();
   int i;
   for(i=0; i<FILE_MAX; i++){
@@ -196,9 +188,18 @@ process_exit (void)
 
   while(!list_empty(&curr->sup_page_table)){ 
     struct list_elem* e = list_pop_front(&curr->sup_page_table);
+    
     /* need to change bitmap, too.. */
     free_page(e);  
   }
+
+  lock_release(&lock_frame);
+
+  curr->is_exited = true;
+  sema_up(&curr->sema_wait);
+  /* wait until parent removes the child in the list */
+  sema_down(&curr->sema_exited);
+
 
   // struct list_elem* e;
   // struct list_elem* e_next;
