@@ -21,7 +21,6 @@ swap_init (void)
     lock_init(&swap_lock);
 }
 
-
 disk_sector_t
 get_empty_sector_num(void){
 
@@ -32,7 +31,6 @@ get_empty_sector_num(void){
         PANIC("bitmap full");
     }
 }
-
 
 /*
  * Reclaim a frame from swap device.

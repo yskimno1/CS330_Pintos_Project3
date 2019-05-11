@@ -12,18 +12,15 @@
 #include "filesys/file.h"
 #include "threads/vaddr.h"
 // #include "filesys/directory.h"
-
 // #include "filesys/filesys.h"
 
-
-
-/* true if A is less than B */
-bool
-list_less(const struct list_elem* a, const struct list_elem* b, void* aux){
-    struct sup_page_table_entry* spt_e_1 = list_entry(a, struct sup_page_table_entry, elem);
-    struct sup_page_table_entry* spt_e_2 = list_entry(b, struct sup_page_table_entry, elem);
-    return (spt_e_1->user_vaddr < spt_e_1->user_vaddr); // not using hash_func b/c all user_vaddr are different
-}
+// /* true if A is less than B */
+// bool
+// list_less(const struct list_elem* a, const struct list_elem* b, void* aux){
+//     struct sup_page_table_entry* spt_e_1 = list_entry(a, struct sup_page_table_entry, elem);
+//     struct sup_page_table_entry* spt_e_2 = list_entry(b, struct sup_page_table_entry, elem);
+//     return (spt_e_1->user_vaddr < spt_e_1->user_vaddr); // not using hash_func b/c all user_vaddr are different
+// }
 
 bool
 page_insert(struct sup_page_table_entry* spt_e){
@@ -84,18 +81,17 @@ allocate_page (void* addr, bool loaded, enum palloc_type p_type, uint32_t read_b
 
 struct sup_page_table_entry*
 find_page(void* addr){
-    // printf("Addr : %p\n", addr);
+
     void* aligned_addr = pg_round_down(addr);
     struct sup_page_table_entry* spt_e;
-    // printf("aligned : %p\n", aligned_addr);
+
     struct list_elem* e;
     struct thread* curr = thread_current();
 
-    // printf("finding page address %p\n", &curr->sup_page_table);
     if(!list_empty(&curr->sup_page_table)){
         for(e=list_begin(&curr->sup_page_table); e!=list_end(&curr->sup_page_table); e = list_next(e)){
             spt_e = list_entry(e, struct sup_page_table_entry, elem);
-            // printf("iteration : %p\n", spt_e->user_vaddr);
+
             if(spt_e->user_vaddr == aligned_addr) return spt_e;
         }
     }
@@ -133,7 +129,7 @@ page_handling(struct sup_page_table_entry* spt_e){
 
 bool
 file_handling(struct sup_page_table_entry* spt_e){
-    // printf("file handling! \n");
+
     void* frame;
     if(spt_e->read_bytes == 0) frame = allocate_frame(spt_e, PAL_USER|PAL_ZERO);
     else frame = allocate_frame(spt_e, PAL_USER);
@@ -141,7 +137,7 @@ file_handling(struct sup_page_table_entry* spt_e){
 
     if(spt_e->read_bytes > 0){
         off_t temp = file_read_at (spt_e->file, frame, spt_e->read_bytes, spt_e->offset);
-        // printf("temp : %d\n", temp);
+
         if (temp != (int) spt_e->read_bytes){
             free_frame(frame);
             ASSERT(0);
@@ -193,14 +189,12 @@ grow_stack(void* addr, enum palloc_type ptype){
         frame_addr = allocate_frame(spt_e, PAL_USER|PAL_ZERO);
     }
     if(frame_addr==NULL){
-        printf("frame null\n");
         free(spt_e);
         return false;
     }
 
     bool success = install_page(page_addr, frame_addr, true);
     if(success == false){
-        printf("install page failed\n");
         free_frame(frame_addr);
         free(spt_e);
         return false;

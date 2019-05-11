@@ -62,11 +62,10 @@ list_remove_by_fd(int fd){
 	int matched = 0;
 	struct thread* curr = thread_current();
 	struct file_entry* fe;
-	// printf("finding page address %p\n", &curr->sup_page_table);
+
 	if(!list_empty(&curr->list_file)){
 			for(e=list_begin(&curr->list_file); e!=list_end(&curr->list_file); e = list_next(e)){
 					fe = list_entry(e, struct file_entry, elem_file);
-					// printf("iteration : %p\n", spt_e->user_vaddr);
 					if(fe->fd == fd){
 						matched = 1;
 						break;
@@ -74,11 +73,7 @@ list_remove_by_fd(int fd){
 			}
 	}
 	if(matched) list_remove(e);
-	else{
-		// printf("no fd, but close!\n");
-		// ASSERT(0);
-		return;
-	}
+	else		return;
 }
 
 void
@@ -131,7 +126,6 @@ syscall_handler (struct intr_frame *f)
 			int result = create((const char*)argv0, (unsigned)argv1, if_esp);
 			filelock_release();
 			if(result == -1){
-
 				exit(-1);
 				break;
 			}
@@ -238,17 +232,11 @@ syscall_handler (struct intr_frame *f)
 
 uint32_t* 
 p_argv(void* addr){
-	// printf("addr : %p\n", addr);
-  if (addr==NULL){
-    exit(-1);
-	}
-  if (!is_user_vaddr(addr) || addr < STACK_BOTTOM){
-    exit(-1);
-	}
-	// if(is_bad_pointer(addr)){
-	// 	exit(-1);
-	// }
 
+  if (addr==NULL)		exit(-1);
+	
+  if (!is_user_vaddr(addr) || addr < STACK_BOTTOM)	exit(-1);
+	
   return (uint32_t *)(addr);
 }
 
@@ -256,26 +244,26 @@ void
 check_page(void* buffer, unsigned size, void* esp){
 	void* ptr = buffer;
 	for(;ptr<buffer+size; ptr++){
-		// printf("ptr : %p, %p + %d\n", ptr, buffer, size);
+
 		if (is_bad_pointer(ptr)){
-			// printf("came!\n");
 			struct sup_page_table_entry* spt_e = find_page(ptr);
+			
 			if(spt_e != NULL){
 				bool success = page_handling(spt_e);
 				if(success == false) ASSERT(0);
 			}
+
 			if(ptr >= esp - 32){
-				// printf("grow stack at pointer %p!\n", ptr);
 				lock_acquire(&lock_frame);
 				bool success = grow_stack(ptr, PAGE_FAULT);
 				lock_release(&lock_frame);
 				if(success == false){
-
 					filelock_release();
 					exit(-1);
 				}
 			}
 		}
+
 	}
 }
 
@@ -291,20 +279,13 @@ exit (int status){
 	printf("%s: exit(%d)\n", thread_name(), status);
 	int i; 
 	if(!thread_current()->is_exited) file_close(thread_current()->main_file);
-	// for (i = 3; i < FILE_MAX; i++) {
-  //     if (t->fdt[i] != NULL){
-  //       file_close(t->fdt[i]);
-  //       t->fdt[i] = NULL;
-  //     }  
-  // }   
+
 	thread_exit ();
 } 
 
 pid_t 
 exec (const char *cmd_line){
-  if (!string_validate(cmd_line)){
-    exit(-1);
-	}
+  if (!string_validate(cmd_line))	exit(-1);
 	tid_t pid = process_execute (cmd_line);
   return pid;
 }
@@ -337,13 +318,11 @@ int remove (const char *file){
 }
 
 int open (const char *file){
-  if (!string_validate(file) || strlen(file)>14)
-    return -1;
-	filelock_acquire();
+  if (!string_validate(file) || strlen(file)>14) return -1;
 	
+	filelock_acquire();
 	struct file* f = filesys_open(file);
 	if (f == NULL) {
-
 		filelock_release();
 		return -1;
 	}
@@ -357,7 +336,6 @@ int open (const char *file){
   if (!strcmp(t->name, file)){
       file_deny_write(f);
 	}
-
   return fd; 
 }
 
@@ -407,9 +385,8 @@ int read (int fd, void *buffer, unsigned size, void* esp){
 int write (int fd, const void *buffer, unsigned size, void* esp){
 
   int cnt=-1;
-  if (!fd_validate(fd)){
-  	return cnt;
-  }
+  if (!fd_validate(fd))			return cnt;
+
   if (!string_validate(buffer)){
 		exit(-1);
     return cnt;
@@ -435,15 +412,13 @@ int write (int fd, const void *buffer, unsigned size, void* esp){
 }
 
 void seek (int fd, unsigned position){
-	if (!fd_validate(fd))
-		return;
+	if (!fd_validate(fd))		return;
 	struct file* f = thread_current()->fdt[fd];
   file_seek (f, position);  
 }
 
 int tell (int fd){
-	if (!fd_validate(fd))
-		return -1;
+	if (!fd_validate(fd))		return -1;
 	struct file* f = thread_current()->fdt[fd];
 	return file_tell(f);
 }
@@ -458,20 +433,7 @@ void close (int fd){
 	struct file* f = t->fdt[fd];
 	t->fdt[fd] = NULL;
 	file_close(f);
-
 	filelock_release();
-}
-
-bool exist_same_mmap(struct file* file){
-	struct list_elem* e;
-	if(!list_empty(&thread_current()->list_mmap)){
-		for(e=list_begin(&thread_current()->list_mmap); e!=list_end(&thread_current()->list_mmap); e=list_next(e)){
-			struct page_mmap* mmap_e = list_entry(e,struct page_mmap, elem_mmap);
-			if(mmap_e->spt_e->file == file) return true;
-
-		}
-	}
-	return false;
 }
 
 int mmap(int fd, void* addr){ //needs lazy loading
@@ -594,11 +556,8 @@ void munmap(int mapid){
 				e = list_remove(e);
 			}
 		}
-		else{
-			e = list_next(e);
-		}
+		else	e = list_next(e);
 	}
-
 	lock_release(&lock_frame);
 	return;
 }
@@ -615,13 +574,10 @@ fd_validate(int fd){
 
 bool
 string_validate(const char* ptr){
-	if (!is_user_vaddr(ptr))
-    return false;
-  if (ptr == NULL)
-    return false;
-	if (strcmp(ptr, "")==0){
-		return -1;
-	}
+	if (!is_user_vaddr(ptr))  return false;
+  if (ptr == NULL) 					return false;
+	if (strcmp(ptr, "")==0)		return -1;
+	
   return true;
 }
 
@@ -629,9 +585,6 @@ bool
 is_bad_pointer(const char* ptr){
 	if(is_kernel_vaddr(ptr)) return false;
 	void* ptr_page = pagedir_get_page(thread_current()->pagedir, ptr);
-	if(!ptr_page){
-		// printf("bad pointer at %p\n", ptr);
-		return true;
-	}
-	else return false;
+	if(!ptr_page)				return true;
+	else 								return false;
 }

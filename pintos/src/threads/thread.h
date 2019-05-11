@@ -115,10 +115,10 @@ struct thread
     unsigned magic;                     /* Detects stack overflow. */
 
     struct list sup_page_table;
-    struct list list_file;
     struct list list_mmap;
     int map_id;
-    //struct ~~ s_pt;
+
+    struct list list_file;              /* not used variable, but just for the case */
   };
 
 /* If false (default), use round-robin scheduler.

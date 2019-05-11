@@ -178,8 +178,6 @@ process_exit (void)
   /* wait until parent removes the child in the list */
   sema_down(&curr->sema_exited);
 
-  
-
   lock_acquire(&lock_frame);
   if(!list_empty(&thread_current()->list_mmap)){
 		for(e=list_begin(&thread_current()->list_mmap); e!=list_end(&thread_current()->list_mmap); e=list_next(e)){
@@ -190,11 +188,13 @@ process_exit (void)
 	}
   lock_release(&lock_frame);
 
+  /* free all sup table */
   while(!list_empty(&curr->sup_page_table)){ 
     struct list_elem* e = list_pop_front(&curr->sup_page_table);
     /* need to change bitmap, too.. */
     free_page(e);  
   }
+  /* close all files */
   int i;
   for(i=0; i<FILE_MAX; i++){
     file_close(curr->fdt[i]);
@@ -542,8 +542,6 @@ load_segment (struct file *file, off_t ofs, uint8_t *upage,
   return true;
 }
 
-
-
 /* Create a minimal stack by mapping a zeroed page at the top of
    user virtual memory. */
 static bool
@@ -598,11 +596,7 @@ setup_stack (void **esp, int argc, void** argv)
 
     // hex_dump(*esp-4, *esp-4, 100, 1);
   }
-  else{
-    
-  }
   return success;
-  
 }
 
 /* Adds a mapping from user virtual address UPAGE to kernel
