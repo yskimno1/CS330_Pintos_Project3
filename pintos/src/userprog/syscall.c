@@ -288,12 +288,12 @@ exit (int status){
   t->exit_status = status;
 	printf("%s: exit(%d)\n", thread_name(), status);
 	int i; 
-	for (i = 3; i < FILE_MAX; i++) {
-      if (t->fdt[i] != NULL){
-        file_close(t->fdt[i]);
-        t->fdt[i] = NULL;
-      }  
-  }   
+	// for (i = 3; i < FILE_MAX; i++) {
+  //     if (t->fdt[i] != NULL){
+  //       file_close(t->fdt[i]);
+  //       t->fdt[i] = NULL;
+  //     }  
+  // }   
 	thread_exit ();
 } 
 

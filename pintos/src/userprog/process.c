@@ -178,8 +178,8 @@ process_exit (void)
 
   sema_up(&curr->sema_wait);
   /* wait until parent removes the child in the list */
-
   sema_down(&curr->sema_exited);
+  
   filelock_acquire();
   file_close(curr->main_file);
   filelock_release();
