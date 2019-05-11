@@ -163,6 +163,13 @@ process_exit (void)
 
   file_close(curr->main_file);  
 
+
+
+  curr->is_exited = true;
+  sema_up(&curr->sema_wait);
+  /* wait until parent removes the child in the list */
+  sema_down(&curr->sema_exited);
+
   lock_acquire(&lock_frame);
 
   if(!list_empty(&thread_current()->list_mmap)){
@@ -191,15 +198,12 @@ process_exit (void)
     free_page(e);  
   }
 
-  curr->is_exited = true;
-  sema_up(&curr->sema_wait);
-  /* wait until parent removes the child in the list */
-  sema_down(&curr->sema_exited);
-
   int i;
   for(i=0; i<FILE_MAX; i++){
     file_close(curr->fdt[i]);
   }
+
+
 
   // struct list_elem* e;
   // struct list_elem* e_next;
