@@ -93,7 +93,7 @@ syscall_handler (struct intr_frame *f)
 {
   void* if_esp = f->esp;
   if(is_kernel_vaddr(if_esp)){
-		file_close(thread_current()->main_file);
+		if(!thread_current()->is_exited) file_close(thread_current()->main_file);
     thread_exit(); 
     return;
   }
@@ -298,7 +298,7 @@ exit (int status){
   t->exit_status = status;
 	printf("%s: exit(%d)\n", thread_name(), status);
 	int i; 
-	file_close(thread_current()->main_file);
+	f(!thread_current()->is_exited) file_close(thread_current()->main_file);
 	// for (i = 3; i < FILE_MAX; i++) {
   //     if (t->fdt[i] != NULL){
   //       file_close(t->fdt[i]);
