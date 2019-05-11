@@ -402,33 +402,30 @@ int read (int fd, void *buffer, unsigned size, void* esp){
 }
 
 int write (int fd, const void *buffer, unsigned size, void* esp){
-	filelock_acquire();
+
   int cnt=-1;
   if (!fd_validate(fd)){
-		filelock_release();
   	return cnt;
   }
   if (!string_validate(buffer)){
-		filelock_release();
 		exit(-1);
     return cnt;
 	}
 	check_page(buffer, size, esp);
 
 	if (fd ==0){
-		filelock_release();
 		exit(-1);
 		return -1;
 	}
 
 	if (fd == 1){
 		putbuf (buffer, size);
-    filelock_release();
     return size;  
 	}
 
 	struct thread* t = thread_current();
 	struct file* f = t->fdt[fd];
+	filelock_acquire();
 	cnt = file_write(f, buffer, size);	
 	filelock_release();
 	return cnt;
