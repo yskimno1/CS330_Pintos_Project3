@@ -164,6 +164,7 @@ syscall_handler (struct intr_frame *f)
 			result = filesize((int)argv0);
 			filelock_release();
 			if(result == -1){
+				printf("here!\n");
 				exit(-1);
 				break;
 			}
