@@ -161,6 +161,12 @@ process_exit (void)
   uint32_t *pd;
   /* unmap all */
   printf("exit!\n");
+
+  curr->is_exited = true;
+  sema_up(&curr->sema_wait);
+  /* wait until parent removes the child in the list */
+  sema_down(&curr->sema_exited);
+
   lock_acquire(&lock_frame);
   if(!list_empty(&thread_current()->list_mmap)){
 		for(e=list_begin(&thread_current()->list_mmap); e!=list_end(&thread_current()->list_mmap); e=list_next(e)){
@@ -180,10 +186,6 @@ process_exit (void)
 	}
 
   lock_release(&lock_frame);
-  curr->is_exited = true;
-  sema_up(&curr->sema_wait);
-  /* wait until parent removes the child in the list */
-  sema_down(&curr->sema_exited);
 
   filelock_acquire();
   int i;
