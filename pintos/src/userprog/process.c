@@ -176,10 +176,9 @@ process_exit (void)
   curr->is_exited = true;
   sema_up(&curr->sema_wait);
   /* wait until parent removes the child in the list */
-  file_close(curr->main_file);
-  sema_down(&curr->sema_exited);
 
-  
+  sema_down(&curr->sema_exited);
+  file_close(curr->main_file);
 
   lock_acquire(&lock_frame);
   if(!list_empty(&thread_current()->list_mmap)){
