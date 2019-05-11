@@ -86,7 +86,6 @@ search_frame_table_entry (void* frame){
 
 bool
 evict_frame (void){
-    printf("evict frame!\n");
     struct list_elem* e;
     struct frame_table_entry* fte;
     if(!list_empty(&frame_table)){
