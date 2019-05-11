@@ -208,6 +208,7 @@ process_exit (void)
   //   free(spt_e);
   //   e = e_next;
   // }
+  printf("exit done\n");
 
   /* Destroy the current process's page directory and switch back
     to the kernel-only page directory. */

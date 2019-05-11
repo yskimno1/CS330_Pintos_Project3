@@ -86,7 +86,7 @@ search_frame_table_entry (void* frame){
 
 bool
 evict_frame (void){
-
+    printf("evict frame!\n");
     struct list_elem* e;
     struct frame_table_entry* fte;
     if(!list_empty(&frame_table)){
@@ -101,7 +101,7 @@ evict_frame (void){
                     fte->spte->is_swapped = true;
                 }
                 list_remove(&fte->elem_table_list);
-                printf("type : %d\n", fte->spte->file_type);
+                printf("1type : %d\n", fte->spte->file_type);
                 pagedir_clear_page(fte->owner->pagedir, fte->spte->user_vaddr);
                 palloc_free_page(fte->frame);
                 
@@ -126,7 +126,7 @@ evict_frame (void){
                 }
 
                 list_remove(&fte->elem_table_list);
-                printf("type : %d\n", fte->spte->file_type);
+                printf("2type : %d\n", fte->spte->file_type);
                 pagedir_clear_page(fte->owner->pagedir, fte->spte->user_vaddr);
                 palloc_free_page(fte->frame);
 
