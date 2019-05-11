@@ -289,9 +289,9 @@ thread_exit ()
   ASSERT (!intr_context ());
 
 #ifdef USERPROG
-  process_exit ();
+  
 #endif
-
+  process_exit ();
   /* Just set our status to dying and schedule another process.
      We will be destroyed during the call to schedule_tail(). */
   intr_disable ();
