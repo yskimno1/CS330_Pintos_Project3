@@ -159,6 +159,8 @@ process_exit (void)
   struct list_elem* e;
   struct thread *curr = thread_current ();
   uint32_t *pd;
+  curr->is_exited = true;
+
   /* unmap all */
   filelock_acquire();
   if(!list_empty(&thread_current()->list_mmap)){
@@ -173,11 +175,7 @@ process_exit (void)
 	}
   filelock_release();
 
-  filelock_acquire();
-  file_close(curr->main_file);
-  filelock_release();
-  
-  curr->is_exited = true;
+  file_close(thread_current()->main_file);
 
   sema_up(&curr->sema_wait);
   /* wait until parent removes the child in the list */
