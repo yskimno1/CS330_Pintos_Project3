@@ -161,14 +161,12 @@ process_exit (void)
   uint32_t *pd;
   /* unmap all */
 
-  file_close(curr->main_file);  
-
-
-
   curr->is_exited = true;
   sema_up(&curr->sema_wait);
   /* wait until parent removes the child in the list */
   sema_down(&curr->sema_exited);
+
+  file_close(curr->main_file);  
 
   lock_acquire(&lock_frame);
 
