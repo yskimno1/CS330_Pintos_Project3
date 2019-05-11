@@ -560,7 +560,9 @@ setup_stack (void **esp, int argc, void** argv)
   uint8_t *kpage;
   bool success = false;
 
+  lock_acquire(&lock_frame);
   success = grow_stack(((uint8_t* )PHYS_BASE) - PGSIZE, GROW_STACK);
+  lock_release(&lock_frame);
   if(success){
     *esp = PHYS_BASE;
     /* Implementation start */
