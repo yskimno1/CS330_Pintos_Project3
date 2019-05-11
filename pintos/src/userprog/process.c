@@ -167,20 +167,19 @@ process_exit (void)
 		for(e=list_begin(&thread_current()->list_mmap); e!=list_end(&thread_current()->list_mmap); e=list_next(e)){
 			struct page_mmap* mmap_e = list_entry(e,struct page_mmap, elem_mmap);
       if(pagedir_is_dirty(thread_current()->pagedir, mmap_e->spt_e->user_vaddr)){
-
         file_write_at(mmap_e->spt_e->file, mmap_e->spt_e->user_vaddr, mmap_e->spt_e->read_bytes, mmap_e->spt_e->offset);
-
       }
     }
 	}
   filelock_release();
 
-  file_close(thread_current()->main_file);
+  
 
   sema_up(&curr->sema_wait);
   /* wait until parent removes the child in the list */
   sema_down(&curr->sema_exited);
 
+  file_close(thread_current()->main_file);
 
   lock_acquire(&lock_frame);
   if(!list_empty(&thread_current()->list_mmap)){
